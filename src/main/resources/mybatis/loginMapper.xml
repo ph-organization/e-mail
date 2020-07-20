@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace mapper接口 必填 随便填值 防止SQL语句ID重名-->
+<mapper namespace="com.puhui.email.mapper.LoginMapper">
+
+<select id="loadUserByEmail" parameterType="string" resultType="com.puhui.email.entity.MailUser">
+    SELECT * FROM mail_user WHERE email=#{email}
+</select>
+
+    <select id="getUserRole" parameterType="integer" resultType="com.puhui.email.entity.Role">
+        SELECT ro.* FROM t_role ro,mail_user mu,t_realtion rea WHERE ro.id=rea.role_id and rea.user_id=mu.id and mu.id=#{id}
+    </select>
+</mapper>

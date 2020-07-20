@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace mapper接口 必填 随便填值 防止SQL语句ID重名-->
+<mapper namespace="com.puhui.email.mapper.RoleMapper">
+
+    <!--    //根据邮箱查询自己的角色-->
+    <select id="roleSelect" parameterType="string" resultType="com.puhui.email.entity.Role">
+        SELECT ro.* FROM t_role ro,mail_user mu,t_realtion rea WHERE ro.id=rea.role_id and mu.id=rea.user_id and mu.email=#{email};
+    </select>
+    <!--根据角色查询-->
+    <select id="roleSelectNote" parameterType="string" resultType="com.puhui.email.entity.Role">
+        SELECT * FROM t_role WHERE  role_admin=#{role_admin};
+    </select>
+    <!--根据角色查询该角色下所有用户-->
+    <select id="roleSelectUser" parameterType="string" resultType="com.puhui.email.entity.MailUser">
+        SELECT mu.* FROM t_realtion res ,mail_user mu,t_role ro WHERE  res.user_id=mu.id and res.role_id=ro.id and ro.role_admin=#{role_admin};
+    </select>
+</mapper>

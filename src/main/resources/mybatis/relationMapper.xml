@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace mapper接口 必填 随便填值 防止SQL语句ID重名-->
+<mapper namespace="com.puhui.email.mapper.RelationMapper">
+
+    <parameterMap id="relationPOJO" type="com.puhui.email.mapper.RelationMapper">
+        <parameter property="user_id" javaType="integer"></parameter>
+        <parameter property="role_id" javaType="integer"></parameter>
+    </parameterMap>
+
+    <!--    //添加关联-->
+    <insert id="relationInsert" parameterType="com.puhui.email.entity.Relation">
+        INSERT INTO t_realtion(user_id,role_id)
+                VALUES(#{user_id},#{role_id})
+    </insert>
+    <!--    //删除关联-->
+    <delete id="relationDelete" parameterMap="relationPOJO">
+        DELETE  FROM t_realtion WHERE  user_id=#{user_id} and role_id=#{role_id};
+    </delete>
+</mapper>
