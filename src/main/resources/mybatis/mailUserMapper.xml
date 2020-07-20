@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace mapper接口 必填 随便填值 防止SQL语句ID重名-->
+<mapper namespace="com.puhui.email.mapper.MailUserMapper">
+
+    <parameterMap id="logicDelete" type="com.puhui.email.entity.MailUser">
+        <parameter property="lose_user" javaType="String"></parameter>
+        <parameter property="emil" javaType="String"></parameter>
+    </parameterMap>
+
+    <!--    //添加用户-->
+    <insert id="mailUserInsert" parameterType="com.puhui.email.entity.MailUser">
+        INSERT INTO mail_user(name,sex,birthday,email,phone,pwd,address,lose_user,create_time)
+                VALUES(#{name},#{sex},#{birthday},#{email},#{phone},#{pwd},#{address},#{lose_user},#{create_time})
+    </insert>
+    <!--    //添加逻辑删除后的用户(重启逻辑删除后的用户)-->
+    <update id="mailUserRestart" parameterType="com.puhui.email.entity.MailUser">
+          UPDATE mail_user SET name=#{name},sex=#{sex},birthday=#{birthday},phone=#{phone},pwd=#{pwd},address=#{address},lose_user=#{lose_user},create_time=#{create_time}
+            WHERE email=#{email}
+    </update>
+
+    <!--    //逻辑删除用户-->
+    <update id="mailUserLogicDelete" parameterType="com.puhui.email.entity.MailUser">
+        UPDATE mail_user
+        SET lose_user=#{lose_user}
+        WHERE email=#{email}
+    </update>
+    <!--    //逻辑删除多个用户-->
+    <update id="mailUserLogicDeleteS" parameterType="list">
+        UPDATE mail_user SET lose_user='false' WHERE id in
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+             #{item}
+        </foreach>
+    </update>
+
+    <!--    //修改用户-->
+    <update id="mailUserUpdate" parameterType="com.puhui.email.entity.MailUser">
+        UPDATE mail_user
+            SET name=#{name},sex=#{sex},birthday=#{birthday},phone=#{phone},pwd=#{pwd},address=#{address},update_time=#{update_time}
+            WHERE email=#{email}
+    </update>
+
+    <!--    //根据邮箱查询用户-->
+    <select id="mailUserSelect" parameterType="string" resultType="com.puhui.email.entity.MailUser">
+        SELECT * FROM mail_user WHERE email=#{email}
+    </select>
+    <!--    //根据邮箱模糊查询用户-->
+    <select id="mailUserDimSelect" parameterType="string" resultType="com.puhui.email.entity.MailUser">
+        SELECT * FROM mail_user WHERE email like concat('%',#{email},'%')
+    </select>
+    <!--    //根据id查询用户-->
+    <select id="mailUserSelectById" parameterType="list" resultType="com.puhui.email.entity.MailUser">
+        SELECT * FROM mail_user WHERE id in
+        <foreach collection="list" item="id" open="(" close=")" separator=","><!-- in（id1，id2）分隔符 -->
+            #{id}
+        </foreach>
+    </select>
+
+    <!--    //根据角色id查询用户-->
+    <select id="mailUserSelectByRole" parameterType="int" resultType="com.puhui.email.entity.MailUser">
+        SELECT mu.* FROM mail_user mu,t_role ro,t_realtion rea WHERE mu.id=rea.user_id and ro.id=rea.role_id and ro.id=#{id}
+    </select>
+
+    <!--查询全部-->
+    <select id="mailUserSelectAll" resultType="com.puhui.email.entity.MailUser">
+        SELECT * FROM mail_user
+    </select>
+
+    <!-- //普通用户 start-->
+    <select id="queryUserByName" parameterType="String" resultType="com.puhui.email.entity.MailUser">
+        SELECT * FROM mail_user WHERE name=#{name}
+    </select>
+</mapper>
