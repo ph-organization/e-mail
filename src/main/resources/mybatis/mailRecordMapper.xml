@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace mapper接口 必填 随便填值 防止SQL语句ID重名-->
+<mapper namespace="com.puhui.email.mapper.MailRecordMapper">
+
+
+   <insert id="insertMailRecord" parameterType="com.puhui.email.entity.MailRecord" >
+       insert into mail_record (topic,content,result,sendtime,email,filepath,target) values (#{topic},#{content},#{result},#{sendtime},#{email},#{filepath},#{target})
+   </insert>
+    <!--根据邮箱删除记录-->
+    <delete id="mailRecordDelete" parameterType="string">
+        DELETE FROM mail_record WHERE email=#{email}
+    </delete>
+
+    <select id="findMailRecordById" parameterType="int" resultType="com.puhui.email.entity.MailRecord">
+        SELECT * FROM mail_record WHERE id=#{id}
+    </select>
+
+    <!--根据id删除指定主题邮件记录-->
+    <delete id="deleteMailRecordById" parameterType="integer">
+        DELETE FROM mail_record WHERE id=#{id}
+    </delete>
+
+    <!--根据邮箱查询所有记录-->
+    <select id="mailRecordSelect" parameterType="string" resultType="com.puhui.email.entity.MailRecord">
+    SELECT * FROM mail_record WHERE email=#{email}
+    </select>
+</mapper>

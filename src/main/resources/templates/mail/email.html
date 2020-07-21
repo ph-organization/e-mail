@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+
+<body>
+
+<div>模板邮件发送</div>
+<div>邮件信息是：
+    <table border="1">
+        <tr>
+            <td>邮件主题</td>
+            <td th:text="${topic}"></td>
+        </tr>
+        <tr>
+            <td>邮件内容</td>
+            <td th:text="${content}"></td>
+        </tr>
+        <tr>
+            <td>发送人：</td>
+            <td th:text="${sender}"></td>
+        </tr>
+    </table>
+</div>
+<div>
+    <a href="http://www.baidu.com">如有任何不懂的问题，点击查询：</a>
+</div>
+
+</body>
+
+</html>
