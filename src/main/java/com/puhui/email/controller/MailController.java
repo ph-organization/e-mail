@@ -28,9 +28,10 @@ import java.util.List;
  */
 @RestController
 @Slf4j
-@Api (value="邮件发送controller",tags={"邮件发送接口"})
+@Api (value = "邮件发送controller", tags = {"邮件发送接口"})
 public class MailController {
 
+    private static BaseResult result = new BaseResult("", "");
     @Autowired
     private RedisTemplate<String, String> redisTemplates;
     @Autowired
@@ -43,7 +44,6 @@ public class MailController {
     private RedisTemplate redisTemplate;
     @Autowired
     private MailUserService userService;
-    private static BaseResult result = new BaseResult("", "");
 
     /**
      * 发送邮件接口
@@ -53,18 +53,20 @@ public class MailController {
      * @param content 邮件内容
      */
     @ApiOperation ("普通邮件发送")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "target", value = "目标用户名", required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "topic", value = "邮件主题", required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "content", value = "邮件内容", required = true, dataType = "String", paramType = "query"),
+    @ApiImplicitParams ({
+            @ApiImplicitParam (name = "target", value = "目标用户名", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam (name = "topic", value = "邮件主题", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam (name = "content", value = "邮件内容", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam (name = "sendTemplateMail", value = "是否使用模板发送", required = true, dataType = "Boolean", paramType = "query"),
     })
     @PostMapping ("/mail/sendMail")
-    public BaseResult sendSimpleMail(String target, String topic, String content, MultipartFile multipartFile) throws Exception {
+    public BaseResult sendSimpleMail(String target, String topic, String content, MultipartFile multipartFile, Boolean sendTemplateMail) throws Exception {
 
+        log.info(sendTemplateMail.toString()+"-----------------------");
         //根据用户名查询用户
         MailUser user = mailUserService.queryUserByName(target);
 
-        if (user!=null){
+        if (user != null) {
 
             //获取  redis数据库 中对用户名缓存的标识码
             String redisNameCode = redisTemplates.opsForValue().get(user.getName());
@@ -81,62 +83,65 @@ public class MailController {
                 return result;
             }
             //判断该邮箱当天是否已经成功发送过一次邮件
-            if (redisEmailCode !=null){
+            if (redisEmailCode != null) {
                 result.setCode("1");
                 result.setSuccess(false);
                 result.setMessage("由于邮箱资源有限，同一用户邮箱每天只能发送一次邮件");
                 return result;
             }
-            mailService.sendSimpleMail(user,topic,content,multipartFile);
+            mailService.sendSimpleMail(user, topic, content, multipartFile,sendTemplateMail);
             result.setSuccess(true);
             result.setCode("0");
             result.setMessage("已提交邮件发送请求");
             log.info("提交请求成功");
             return result;
         }
-            //用户不存在的情况下，对结果集进行封装返回
-            result.setSuccess(false);
-            result.setCode("1");
-            result.setMessage("该用户不存在，请核对用户名是否正确");
+        //用户不存在的情况下，对结果集进行封装返回
+        result.setSuccess(false);
+        result.setCode("1");
+        result.setMessage("该用户不存在，请核对用户名是否正确");
         return result;
     }
 
     /**
      * 根据角色名发送邮件给扮演该角色的所有用户
+     *
      * @param roleName
      * @param content
      * @param topic
      * @return
      */
     @ApiOperation ("根据角色发送邮件")
-    @ApiImplicitParams({
+    @ApiImplicitParams ({
 
-            @ApiImplicitParam(name = "roleName", value = "角色名", required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "topic", value = "邮件主题", required = true, dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "content", value = "邮件内容", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam (name = "roleName", value = "角色名", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam (name = "topic", value = "邮件主题", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam (name = "content", value = "邮件内容", required = true, dataType = "String", paramType = "query"),
 
     })
     @PostMapping ("/mail/sendMailByRole")
-    public BaseResult sendEmailByRole(String roleName, String content, String topic){
-        BaseResult result = new BaseResult("","");
+    public BaseResult sendEmailByRole(String roleName, String content, String topic) {
+        BaseResult result = new BaseResult("", "");
         try {
             //根据角色查询角色信息
             Role role = roleService.roleSelectNote(roleName);
-            if (role==null){
+            //如果角色为空，角色不存在
+            if (role == null) {
                 result.setCode("1");
                 result.setSuccess(false);
                 result.setMessage("发送失败，该角色不存在");
-            }else {
-                MailRecord mailRecord=new MailRecord();
+            } else {
+                //角色存在
+                MailRecord mailRecord = new MailRecord();
                 //根据角色关联查询扮演该角色的所有用户
                 List<MailUser> users = mailUserService.mailUserSelectByRole(role.getId());
 
                 ListOperations operations = redisTemplate.opsForList();
                 //将该角色下所有用户放入队列中
                 for (MailUser user : users) {
-                     mailRecord.setEmail(user.getEmail());
-                     mailRecord.setContent(content);
-                     mailRecord.setTopic(topic);
+                    mailRecord.setTarget(user.getEmail());
+                    mailRecord.setContent(content);
+                    mailRecord.setTopic(topic);
                     operations.leftPush("mailRecord", mailRecord);
                 }
                 result.setCode("0");
@@ -150,8 +155,6 @@ public class MailController {
         }
         return result;
     }
-
-
 
 
 }

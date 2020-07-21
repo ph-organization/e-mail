@@ -8,12 +8,14 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="e-mail" />
+        <module name="learnfirst" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="e-mail" target="1.8" />
       <module name="e-mail (1)" target="1.8" />
       <module name="emailchange-task02" target="1.8" />
+      <module name="learnfirst" target="1.8" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
@@ -21,6 +23,7 @@
       <module name="e-mail" options="-parameters" />
       <module name="e-mail (1)" options="-parameters" />
       <module name="emailchange-task02" options="-parameters" />
+      <module name="learnfirst" options="-parameters" />
     </option>
   </component>
 </project>

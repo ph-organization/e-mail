@@ -69,6 +69,7 @@ public class SendMailTask {
         }
     }
 
+
     @Scheduled(cron = "0/10 * * * * ?")
     public void sendMailByRole() throws Exception {
 

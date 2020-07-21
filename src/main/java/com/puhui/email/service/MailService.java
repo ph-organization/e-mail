@@ -15,7 +15,7 @@ public interface MailService {
      * @param topic    主题
      * @param content    内容
      */
-    public void sendSimpleMail(MailUser user, String topic, String content, MultipartFile multipartFile) throws Exception;
+    public void sendSimpleMail(MailUser user, String topic, String content, MultipartFile multipartFile, Boolean sendTemplateMail) throws Exception;
 
     /**
      *

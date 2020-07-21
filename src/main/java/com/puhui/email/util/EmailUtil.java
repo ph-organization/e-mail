@@ -9,6 +9,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 import javax.mail.internet.MimeMessage;
 import java.io.File;
@@ -22,7 +24,7 @@ import java.util.Date;
 @Component
 public class EmailUtil {
     /**
-     * 发送普通邮件工具类
+     * 发送普通邮件
      *
      * @param mailRecord 邮件实体类
      */
@@ -30,6 +32,9 @@ public class EmailUtil {
     private String sender;
     @Autowired
     private JavaMailSender mailSender;
+
+    @Autowired
+    private TemplateEngine templateEngine;
 
     public MailRecord sendSimpleEmail(MailRecord mailRecord) {
 
@@ -54,7 +59,7 @@ public class EmailUtil {
     }
 
     /**
-     * 发送html邮件工具类
+     * 发送html邮件
      */
     public MailRecord sendHtmlEmail(MailRecord mailRecord) throws Exception {
         MimeMessage message = mailSender.createMimeMessage();
@@ -106,7 +111,70 @@ public class EmailUtil {
     /**
      * 发送模板邮件
      */
-    public MailRecord sendThymeleafMail(MailRecord mailRecord){
+    public MailRecord sendTemplateMail(MailRecord mailRecord) throws Exception {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        helper.setFrom(sender);
+        helper.setTo(mailRecord.getEmail());
+        helper.setSubject(mailRecord.getTopic());
+        // 添加正文（使用thymeleaf模板）
+        Context context = new Context();
+        context.setVariable("topic", mailRecord.getTopic());
+        context.setVariable("sender", sender);
+        context.setVariable("content", mailRecord.getContent());
+        String content = this.templateEngine.process("mail/email", context);
+        helper.setText(content, true);
+        String sendtime = CommonUtil.getTimeUtil();
+        log.info("发送模板邮件");
+        mailSender.send(message);
+        log.info("发送成功");
+        mailRecord.setSendtime(sendtime);
+        return mailRecord;
+    }
+
+    /**
+     * 发送带附件的模板邮件
+     * @param mailRecord
+     * @param multipartFile
+     * @return
+     * @throws Exception
+     */
+
+    public MailRecord sendMailWithTempalteandFile(MailRecord mailRecord, MultipartFile multipartFile) throws Exception {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        //设置发件人
+        helper.setFrom(sender);
+        //设置目标邮件
+        helper.setTo(mailRecord.getEmail());
+        //设置主题
+        helper.setSubject(mailRecord.getTopic());
+
+        //使用thymeleaf模板添加正文
+        Context context = new Context();
+        context.setVariable("topic", mailRecord.getTopic());
+        context.setVariable("sender", sender);
+        context.setVariable("content", mailRecord.getContent());
+        String content = this.templateEngine.process("mail/email", context);
+        helper.setText(content, true);
+
+        //添加附件
+
+        //获取文件名
+        String fileName = multipartFile.getOriginalFilename();
+        //文件路径
+        String filepath = "D:\\upload" + File.separator + fileName;
+
+        File file = new File(filepath);
+
+        helper.addAttachment(fileName != null ? fileName : "default.txt", file);
+
+        //发送邮件
+        log.info("发送带附件的模板邮件");
+        mailSender.send(message);
+        String sendtime = CommonUtil.getTimeUtil();
+        log.info("发送成功");
+        mailRecord.setSendtime(sendtime);
         return mailRecord;
     }
 }
