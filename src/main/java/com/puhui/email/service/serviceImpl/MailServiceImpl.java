@@ -37,9 +37,6 @@ public class MailServiceImpl implements MailService {
     @Resource
     private MailUserMapper userMapper;
     @Autowired
-    private RedisTemplate<String, String> redisTemplate;
-
-    @Autowired
     private RedisTemplate<String, Object> template;
     @Autowired
     private RoleService roleService;
@@ -65,7 +62,7 @@ public class MailServiceImpl implements MailService {
     @Async (value = "taskExecutors")
     public void sendSimpleMail(MailUser user, String topic, String content, MultipartFile multipartFile, Boolean sendTemplateMail) throws Exception {
         //获取登录用户的email信息
-        String loginUserEmail = (String) template.opsForValue().get("LoginUserEmail");
+        String loginUserEmail =(String) template.opsForValue().get("LoginUserEmail");
 
         //获取一个随机的标识码，用于标记该用户名
         String nameCode = CommonUtil.getRandomNum();
@@ -73,7 +70,7 @@ public class MailServiceImpl implements MailService {
         String emailCode = CommonUtil.getRandomNum();
 
         //将用户名对应的缓存符放入到redis数据库   设置30分钟失效
-        redisTemplate.opsForValue().set(user.getName(), nameCode, 30, TimeUnit.MINUTES);
+        template.opsForValue().set(user.getName(), nameCode, 30, TimeUnit.MINUTES);
 
 
         MailRecord mailRecord = new MailRecord();
@@ -111,7 +108,7 @@ public class MailServiceImpl implements MailService {
                 log.info("返回的对象是" + mailRecord);
                 //获取此刻距离当天结束还剩多少秒  当做emailCode的过期时间
                 Long seconds = CommonUtil.getSecondsNextEarlyMorning();
-                redisTemplate.opsForValue().set(user.getEmail(), emailCode, seconds, TimeUnit.SECONDS);
+                template.opsForValue().set(user.getEmail(), emailCode, seconds, TimeUnit.SECONDS);
                 //保存邮件信息并清空邮件记录
                 mailRecordService.insertMailRecord(mailRecord);
                 log.info("发送成功");
