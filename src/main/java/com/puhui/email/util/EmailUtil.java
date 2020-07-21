@@ -43,7 +43,7 @@ public class EmailUtil {
         //设置邮件发送人
         message.setFrom(sender);
         //邮件接收人
-        message.setTo(mailRecord.getEmail());
+        message.setTo(mailRecord.getTarget());
         //邮件主题
         message.setSubject(mailRecord.getTopic());
         //邮件内容
@@ -66,7 +66,7 @@ public class EmailUtil {
 
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
         helper.setText(mailRecord.getContent(), true);
-        helper.setTo(mailRecord.getEmail());
+        helper.setTo(mailRecord.getTarget());
         helper.setSubject(mailRecord.getTopic());
         helper.setFrom(sender);
         String sendtime = CommonUtil.getTimeUtil();
@@ -86,7 +86,7 @@ public class EmailUtil {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper messageHelper = new MimeMessageHelper(message, true);//true表示支持复杂类型
         messageHelper.setFrom(sender);
-        messageHelper.setTo(mailRecord.getEmail());
+        messageHelper.setTo(mailRecord.getTarget());
         messageHelper.setSubject(mailRecord.getTopic());
         messageHelper.setText(mailRecord.getContent(), true);
         messageHelper.setSentDate(new Date());
@@ -115,7 +115,7 @@ public class EmailUtil {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
         helper.setFrom(sender);
-        helper.setTo(mailRecord.getEmail());
+        helper.setTo(mailRecord.getTarget());
         helper.setSubject(mailRecord.getTopic());
         // 添加正文（使用thymeleaf模板）
         Context context = new Context();
@@ -146,7 +146,7 @@ public class EmailUtil {
         //设置发件人
         helper.setFrom(sender);
         //设置目标邮件
-        helper.setTo(mailRecord.getEmail());
+        helper.setTo(mailRecord.getTarget());
         //设置主题
         helper.setSubject(mailRecord.getTopic());
 
