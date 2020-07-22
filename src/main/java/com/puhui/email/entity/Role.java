@@ -23,11 +23,11 @@ public class Role {
     private Integer id;
     @ApiParam("角色名")
     private String role_name;
-    @ApiParam("角色权限")
-    private String role_admin;
+    @ApiParam("权限名")
+    private String role_note;
 
-    public Role(String role_admin, String role_name) {
-        this.role_admin = role_admin;
+    public Role(String role_admin, String role_note) {
+        this.role_note = role_note;
         this.role_name = role_name;
     }
 

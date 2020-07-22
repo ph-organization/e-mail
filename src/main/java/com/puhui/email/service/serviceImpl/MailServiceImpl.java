@@ -120,14 +120,14 @@ public class MailServiceImpl implements MailService {
 
 
                 //发送失败将邮件放入垃圾箱
-                if (template.opsForValue().get("垃圾箱" + loginUserEmail) != null) {
-                    List<MailRecord> list = (List<MailRecord>) template.opsForValue().get("垃圾箱" + loginUserEmail);
+                if (template.opsForValue().get("email垃圾箱" + loginUserEmail) != null) {
+                    List<MailRecord> list = (List<MailRecord>) template.opsForValue().get("email垃圾箱" + loginUserEmail);
                     list.add(mailRecord);
-                    template.opsForValue().set("垃圾箱" + loginUserEmail, list, 14, TimeUnit.DAYS);
+                    template.opsForValue().set("email垃圾箱" + loginUserEmail, list, 14, TimeUnit.DAYS);
                 } else {
                     List<MailRecord> list = new ArrayList<>();
                     list.add(mailRecord);
-                    template.opsForValue().set("垃圾箱" + loginUserEmail, list, 14, TimeUnit.DAYS);
+                    template.opsForValue().set("email垃圾箱" + loginUserEmail, list, 14, TimeUnit.DAYS);
                 }
 
                 log.error("给"+user.getName()+"发送邮件失败，已放入垃圾箱");
@@ -141,46 +141,52 @@ public class MailServiceImpl implements MailService {
      */
     @Override
     @Async (value = "taskExecutors")
-    public void sendMailByRole(MailRecord mailRecord) {
+    public void sendMailByRole(MailRecord mailRecord,Boolean sendTemplateMail) {
         //获取用户登录email信息
         String loginUserEmail = (String) template.opsForValue().get("LoginUserEmail");
 
-
-        mailRecord.setTopic(mailRecord.getTopic() + "--根据角色群发的邮件");
+        mailRecord.setTopic(mailRecord.getTopic()+"（给角色发送的邮件）");
         mailRecord.setEmail(loginUserEmail);
         try {
             //调用发送邮件工具类
-            mailRecord = emailUtil.sendSimpleEmail(mailRecord);
-            log.info("返回的对象是:" + mailRecord);
+            if (sendTemplateMail!=null&&sendTemplateMail){
+                //发送模板邮件
+                log.info("发送模板邮件");
+                log.info(mailRecord+"");
+                mailRecord = emailUtil.sendTemplateMail(mailRecord);
+
+            }else {
+                //发送普通邮件
+                log.info("发送普通邮件");
+                mailRecord = emailUtil.sendSimpleEmail(mailRecord);
+            }
+
+
             //保存数据库
             mailRecord.setResult("success");
-            log.info("邮件接收人" + mailRecord.getEmail() + "主题" + mailRecord.getTopic() + "内容" + mailRecord.getContent() + "邮件发送成功");
+            log.info("邮件接收人" + mailRecord.getTarget() + "主题" + mailRecord.getTopic() + "内容" + mailRecord.getContent() + "邮件发送成功");
             //发送成功保存到邮件记录表
             mailRecordService.insertMailRecord(mailRecord);
         } catch (Exception e) {
-            log.error("邮件接收人" + mailRecord.getEmail() + "主题" + mailRecord.getTopic() + "内容" + mailRecord.getContent() + "邮件发送出现异常");
+            log.error("邮件接收人" + mailRecord.getTarget() + "主题" + mailRecord.getTopic() + "内容" + mailRecord.getContent() + "邮件发送出现异常");
             log.error("异常信息为" + e.getMessage());
             log.error("异常堆栈信息为-->");
             String sendtime = CommonUtil.getTimeUtil();
             mailRecord.setSendtime(sendtime);
             mailRecord.setResult("false");
             //发送失败，添加到垃圾箱
-
-
-            if (template.opsForValue().get("垃圾箱" + loginUserEmail) != null) {
-                List<MailRecord> list = (List<MailRecord>) template.opsForValue().get("垃圾箱" + loginUserEmail);
+            if (template.opsForValue().get("email垃圾箱" + loginUserEmail) != null) {
+                List<MailRecord> list = (List<MailRecord>) template.opsForValue().get("email垃圾箱" + loginUserEmail);
                 list.add(mailRecord);
-                template.opsForValue().set("垃圾箱" + loginUserEmail, list, 14, TimeUnit.DAYS);
+                template.opsForValue().set("email垃圾箱" + loginUserEmail, list, 14, TimeUnit.DAYS);
             } else {
                 List<MailRecord> list = new ArrayList<>();
                 list.add(mailRecord);
-                template.opsForValue().set("垃圾箱" + loginUserEmail, list, 14, TimeUnit.DAYS);
+                template.opsForValue().set("email垃圾箱" + loginUserEmail, list, 14, TimeUnit.DAYS);
             }
             log.error("发送失败，存入垃圾箱");
         }
-
     }
-
 
     /**
      * 定时发送邮件
@@ -212,20 +218,18 @@ public class MailServiceImpl implements MailService {
             log.error("异常信息为" + e.getMessage());
             log.error("异常堆栈信息为-->");
 
-            if (template.opsForValue().get("垃圾箱" + loginUserEmail) != null) {
+            if (template.opsForValue().get("email垃圾箱" + loginUserEmail) != null) {
                 List<MailRecord> list = (List<MailRecord>) template.opsForValue().get("垃圾箱" + loginUserEmail);
                 list.add(mailRecord);
-                template.opsForValue().set("垃圾箱" + loginUserEmail, list, 14, TimeUnit.DAYS);
+                template.opsForValue().set("email垃圾箱" + loginUserEmail, list, 14, TimeUnit.DAYS);
             } else {
                 List<MailRecord> list = new ArrayList<>();
                 list.add(mailRecord);
-                template.opsForValue().set("垃圾箱" + loginUserEmail, list, 14, TimeUnit.DAYS);
+                template.opsForValue().set("email垃圾箱" + loginUserEmail, list, 14, TimeUnit.DAYS);
             }
             log.error("发送失败，存入垃圾箱");
         }
 
     }
-
-
 
 }

@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/e-mail.iml" filepath="$PROJECT_DIR$/e-mail.iml" />
-      <module fileurl="file://D:/ideaWorkSpace/learnfirst/learnfirst.iml" filepath="D:/ideaWorkSpace/learnfirst/learnfirst.iml" />
     </modules>
   </component>
 </project>

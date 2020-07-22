@@ -77,14 +77,10 @@ public class SwaggerConfig {
     }
 
     @Bean
-    public Docket getDocket(Environment environment) {
-//        //设置需要显示的swagger环境
-//        Profiles profiles=Profiles.of("dev");
-//        //获取项目环境    判断是否处在自己设定的环境
-//        boolean flag = environment.acceptsProfiles(profiles);
-//        System.out.println(flag);
+    public Docket getDocket01(Environment environment) {
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(getApiInfo())
+                .groupName("发送邮件功能接口")
                 .enable(true)//是否开启swagger
                 .select()
                 //配置要扫描接口的方式
@@ -97,10 +93,27 @@ public class SwaggerConfig {
                  */
                 .apis(RequestHandlerSelectors.basePackage("com.puhui.email.controller"))
                 .paths(PathSelectors.ant("/mail/**"))//只扫描mail有关的接口
-                .build()
-                .groupName("邹玉玺");
+                .build();
 
-
+    }
+    @Bean
+    public Docket getDocket02(Environment environment) {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .apiInfo(getApiInfo())
+                .groupName("发送短信功能接口")
+                .enable(true)//是否开启swagger
+                .select()
+                //配置要扫描接口的方式
+                /**
+                 * basePackage()  指定包扫描  （通常用这个）
+                 * any     扫描全部
+                 * none      全部不扫描
+                 * withMethodAnnotation     扫描方法上的注解（参数是一个注解的反射对象）
+                 * withClassAnnotation        扫描类上的注解（）
+                 */
+                .apis(RequestHandlerSelectors.basePackage("com.puhui.email.controller"))
+                .paths(PathSelectors.ant("/message/**"))//只扫描mail有关的接口
+                .build();
     }
 
     //配置api信息

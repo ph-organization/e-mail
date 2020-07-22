@@ -62,18 +62,18 @@ public class MailRecordServiceImpl implements MailRecordService {
             List<MailRecord> mailRecords = mailRecordMapper.mailRecordSelect(email);
             if (mailRecords!=null) {
                 //查看redis是否已存在该用户回收站
-                if (redisTemplate.opsForValue().get("回收站" + email) != null) {
+                if (redisTemplate.opsForValue().get("email回收站" + email) != null) {
                     //回收站已存在，先取出集合并追加进去
                     List<MailRecord> list = (List<MailRecord>) redisTemplate.opsForValue().get("回收站" + email);
                     //将邮件记录追加进去
                     List<MailRecord> addlist = list.stream().sequential().collect(Collectors.toCollection(() -> mailRecords));
 
                     //list存入redis
-                    redisTemplate.opsForValue().set("回收站" + email, addlist, 7, TimeUnit.DAYS);
+                    redisTemplate.opsForValue().set("email回收站" + email, addlist, 7, TimeUnit.DAYS);
                     log.info("追加到已有回收站成功");
                 } else {
                     //直接存入缓存
-                    redisTemplate.opsForValue().set("回收站" + email, mailRecords, 7, TimeUnit.DAYS);
+                    redisTemplate.opsForValue().set("email回收站" + email, mailRecords, 7, TimeUnit.DAYS);
                     log.info("添加到回收站成功");
                 }
                 //进行删除
@@ -111,14 +111,14 @@ public class MailRecordServiceImpl implements MailRecordService {
     //根据邮箱查询7天内已删除的邮件记录   (数据在redis缓存中，key是"回收站"+email)
     @Override
     public List<MailRecord> maillRecycleBin(String email) {
-        List<MailRecord> list = (List<MailRecord>) redisTemplate.opsForValue().get("回收站"+email);
+        List<MailRecord> list = (List<MailRecord>) redisTemplate.opsForValue().get("email回收站"+email);
         return list;
     }
 
     @Override
     public List<MailRecord> mailRubbish(String email) {
         //返回缓存中发送失败的垃圾邮件
-        List<MailRecord> mailRecords =(List<MailRecord>) redisTemplate.opsForValue().get("垃圾箱" + email);
+        List<MailRecord> mailRecords =(List<MailRecord>) redisTemplate.opsForValue().get("email垃圾箱" + email);
         return mailRecords;
     }
 
@@ -129,18 +129,18 @@ public class MailRecordServiceImpl implements MailRecordService {
         String email= SecurityGetName.getUsername();
         log.info("当前用户名"+email);
         //删除之前先放到redis缓存
-        if(redisTemplate.opsForValue().get("回收站"+email)!=null){
+        if(redisTemplate.opsForValue().get("email回收站"+email)!=null){
             //回收站已存在，先取出集合并追加进去
-            List<MailRecord> list = (List<MailRecord>) redisTemplate.opsForValue().get("回收站"+email);
+            List<MailRecord> list = (List<MailRecord>) redisTemplate.opsForValue().get("email回收站"+email);
             //向list追加需要删除的邮件记录
             list.add(mailRecordById);
             //放入缓存
-            redisTemplate.opsForValue().set("回收站"+email,list,7, TimeUnit.DAYS);
+            redisTemplate.opsForValue().set("email回收站"+email,list,7, TimeUnit.DAYS);
         }else {
             List<MailRecord> mailRecords=new ArrayList<>();
             mailRecords.add(mailRecordById);
             //放入缓存
-            redisTemplate.opsForValue().set("回收站"+email,mailRecords,7, TimeUnit.DAYS);
+            redisTemplate.opsForValue().set("email回收站"+email,mailRecords,7, TimeUnit.DAYS);
         }
 
         //进行删除

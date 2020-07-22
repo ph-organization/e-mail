@@ -16,7 +16,7 @@ public interface RoleMapper {
     public List<Role> roleSelect(String user_email);
 
     //根据角色名查询
-    Role roleSelectNote(String roleName);
+    Role roleSelectNote(String roleNote);
 
     //根据角色名查询该角色下的所有用户
     List<MailUser> roleSelectUser(String roleName);

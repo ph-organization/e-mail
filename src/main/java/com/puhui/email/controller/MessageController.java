@@ -2,13 +2,16 @@ package com.puhui.email.controller;
 
 import com.puhui.email.entity.MailUser;
 import com.puhui.email.entity.Message;
+import com.puhui.email.entity.Role;
 import com.puhui.email.service.MailUserService;
 import com.puhui.email.service.MessageService;
+import com.puhui.email.service.RoleService;
 import com.puhui.email.util.AESUtil;
 import com.puhui.email.util.BaseResult;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,9 +33,13 @@ public class MessageController {
     private MailUserService mailUserService;
     @Autowired
     private MessageService messageService;
+    @Autowired
+    private RoleService roleService;
 
     @Autowired
     private RedisTemplate<String, Object> redisTemplates;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     /**
      * 短信发送接口
@@ -40,8 +47,8 @@ public class MessageController {
      * @param target  目标人
      * @param content 短信内容
      */
-    @ApiOperation ("发送短信")
-    @PostMapping ("/mail/sendMessage")
+    @ApiOperation ("指定用户发送短信")
+    @PostMapping ("/message/sendMessage")
     @ApiImplicitParams ({
             @ApiImplicitParam (name = "target", value = "短信接收人", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam (name = "content", value = "短信内容", required = true, dataType = "String", paramType = "query"),
@@ -82,15 +89,58 @@ public class MessageController {
         return result;
     }
 
+    /**
+     * 发送短信给指定角色下所有用户
+     *
+     * @param roleNote 角色名
+     * @param content  短信内容
+     * @return
+     */
+    @ApiOperation ("根据角色发送短信")
+    @PostMapping ("/message/sendMessageByRole")
+    public BaseResult sendMessageByRole(String roleNote, String content) {
+        //根据角色命名查找角色是否存在
+        Role role = roleService.roleSelectNote(roleNote);
+        if (role != null) {
+            Message message = new Message();
+            //角色存在,查找角色对应所有用户
+            List<MailUser> users = mailUserService.mailUserSelectByRole(role.getId());
+            ListOperations operations = redisTemplate.opsForList();
+            //将封装后的短信实体放入队列
+            users.forEach(str -> {
+                //接收人姓名
+                message.setTarget(str.getName());
+                //接收短信的电话号码
+                message.setTargetphone(AESUtil.decrypt(str.getPhone()));
+                //短信内容
+                message.setContent(content);
+                //将所有短信实体放入队列中
+
+                operations.leftPush("Message", message);
+            });
+            result.setCode("0");
+            result.setSuccess(true);
+            result.setMessage("短信发送任务提交成功");
+        }else {
+            result.setCode("1");
+            result.setSuccess(false);
+            result.setMessage("短信发送失败，该角色不存在");
+        }
+        //角色不存在
+        return result;
+    }
+
+    ;
+
     @ApiOperation ("查看发送短信记录")
-    @GetMapping ("/mail/listMessage")
+    @GetMapping ("/message/listMessage")
     public List<Message> listMessage() {
         List<Message> messages = messageService.listMessage();
         return messages;
     }
 
     @ApiOperation ("删除所有短信记录")
-    @DeleteMapping ("/mail/deleteMessage")
+    @DeleteMapping ("/message/deleteMessage")
     public BaseResult deleteMessage() {
         List<Message> messages = null;
         try {
@@ -110,7 +160,7 @@ public class MessageController {
 
     @ApiOperation ("根据id删除指定短信记录")
     @ApiImplicitParam (name = "id", value = "短信id", required = true, dataType = "String", paramType = "query")
-    @DeleteMapping ("/mail/deleteById")
+    @DeleteMapping ("/message/deleteById")
     public BaseResult deleteById(Integer id) {
         try {
             messageService.deleteById(id);

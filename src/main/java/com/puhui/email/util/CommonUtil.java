@@ -6,7 +6,7 @@ import java.util.Random;
 import java.util.UUID;
 
 public class CommonUtil {
-    private static final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");//设置日期格式
+    private static final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");//设置日期格式
 
     /**
      * 以UUID重命名

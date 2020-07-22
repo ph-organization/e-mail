@@ -51,13 +51,17 @@ public class MailController {
     private MessageService messageService;
 
     /**
-     * 发送邮件接口
-     *
-     * @param target  目标地址
-     * @param topic   邮件主题
-     * @param content 邮件内容
+     * 指定用户发送邮件接口
+     * @param target    邮件发送目标姓名
+     * @param topic    邮件主题
+     * @param content       邮件内容
+     * @param multipartFile       添加的附件
+     * @param sendTemplateMail   是否使用模板发送邮件（默认不使用）
+     * @param sendMessage   是否同时发送短信（默认不发送）
+     * @return
+     * @throws Exception
      */
-    @ApiOperation ("邮件发送")
+    @ApiOperation ("指定用户发送邮件")
     @ApiImplicitParams ({
             @ApiImplicitParam (name = "target", value = "目标用户名", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam (name = "topic", value = "邮件主题", required = true, dataType = "String", paramType = "query"),
@@ -164,25 +168,25 @@ public class MailController {
     /**
      * 根据角色名发送邮件给扮演该角色的所有用户
      *
-     * @param roleName
+     * @param roleNote
      * @param content
      * @param topic
      * @return
      */
     @ApiOperation ("根据角色发送邮件")
     @ApiImplicitParams ({
-
-            @ApiImplicitParam (name = "roleName", value = "角色名", required = true, dataType = "String", paramType = "query"),
+            @ApiImplicitParam (name = "roleNote", value = "角色名", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam (name = "topic", value = "邮件主题", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam (name = "content", value = "邮件内容", required = true, dataType = "String", paramType = "query"),
-
+            @ApiImplicitParam (name = "sendTemplateMail", value = "是否使用模板发送", required = false, dataType = "Boolean", paramType = "query", defaultValue = "false")
+           // @ApiImplicitParam (name = "sendMessage", value = "是否发送短信", required = false, dataType = "Boolean", paramType = "query", defaultValue = "false")
     })
-    @PostMapping ("/mail/sendMailByRole")
-    public BaseResult sendEmailByRole(String roleName, String content, String topic) {
+    @PostMapping ("/mail/sendEmailByRole")
+    public BaseResult sendEmailByRole(String roleNote, String content, String topic, Boolean sendTemplateMail) {
         BaseResult result = new BaseResult("", "");
         try {
             //根据角色查询角色信息
-            Role role = roleService.roleSelectNote(roleName);
+            Role role = roleService.roleSelectNote(roleNote);
             //如果角色为空，角色不存在
             if (role == null) {
                 result.setCode("1");
@@ -195,6 +199,11 @@ public class MailController {
                 List<MailUser> users = mailUserService.mailUserSelectByRole(role.getId());
 
                 ListOperations operations = redisTemplate.opsForList();
+                //将角色名放入队列
+                operations.leftPush("role",roleNote);
+                //将sendTemplateMail放入队列
+
+                operations.leftPush("sendTemplateMail",sendTemplateMail);
                 //将该角色下所有用户放入队列中
                 for (MailUser user : users) {
                     mailRecord.setTarget(user.getEmail());
@@ -204,7 +213,7 @@ public class MailController {
                 }
                 result.setCode("0");
                 result.setSuccess(true);
-                result.setMessage("发送任务提交成功");
+                result.setMessage("邮件发送任务提交成功");
             }
         } catch (Exception e) {
             result.setCode("1");
