@@ -8,7 +8,6 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="e-mail" />
-        <module name="learnfirst" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>

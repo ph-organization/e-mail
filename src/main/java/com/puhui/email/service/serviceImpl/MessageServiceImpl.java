@@ -33,6 +33,8 @@ public class MessageServiceImpl implements MessageService {
     private MailUserService mailUserService;
     @Autowired
     private MessageMapper messageMapper;
+    @Autowired
+    private MessageUtil messageUtil;
 
     //发送短信
     @Override
@@ -44,12 +46,10 @@ public class MessageServiceImpl implements MessageService {
         String phoneCode = CommonUtil.getRandomNum();
         try {
             //发送短信
-            MessageUtil.sendMessage(message);
+            message = messageUtil.sendMessage(message);
             //将用户电话号码对应的缓存符放入到redis数据库   设置30分钟失效
             template.opsForValue().set(message.getTargetphone(), phoneCode, 30, TimeUnit.MINUTES);
-            log.info("发送短信成功");
-            //设置发送时间
-            message.setSendtime(CommonUtil.getTimeUtil());
+
             message.setSender(mailUserService.mailUserSelect(loginUserEmail).getName());
             //保存短信发送记录
             messageMapper.saveMessage(message);

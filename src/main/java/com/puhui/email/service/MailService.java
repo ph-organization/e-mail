@@ -18,10 +18,9 @@ public interface MailService {
     public void sendSimpleMail(MailUser user, String topic, String content, MultipartFile multipartFile, Boolean sendTemplateMail) throws Exception;
 
     /**
-     *
-
+     *根据角色发送邮件
      */
-    public void sendMailByRole(MailRecord mailRecord);
+    public void sendMailByRole(MailRecord mailRecord,Boolean sendTemplateMail);
 
 
     //定时发送邮件  内容已指定

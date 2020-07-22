@@ -4,6 +4,8 @@ import com.puhui.email.entity.MailRecord;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.ListOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -34,8 +36,16 @@ public class EmailUtil {
     private JavaMailSender mailSender;
 
     @Autowired
+    private RedisTemplate redisTemplate;
+
+    @Autowired
     private TemplateEngine templateEngine;
 
+    /**
+     * 发送普通邮件
+     * @param mailRecord
+     * @return
+     */
     public MailRecord sendSimpleEmail(MailRecord mailRecord) {
 
         //创建SimpleMailMessage对象
@@ -112,6 +122,9 @@ public class EmailUtil {
      * 发送模板邮件
      */
     public MailRecord sendTemplateMail(MailRecord mailRecord) throws Exception {
+        //获取角色名（只有根据角色发送才不为空）
+        String role = getRole();
+        log.info("发送邮件工具类中获取到的角色是"+role);
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
         helper.setFrom(sender);
@@ -122,7 +135,17 @@ public class EmailUtil {
         context.setVariable("topic", mailRecord.getTopic());
         context.setVariable("sender", sender);
         context.setVariable("content", mailRecord.getContent());
-        String content = this.templateEngine.process("mail/email", context);
+        String content=null;
+        if (role!=null){
+            log.info("该发送方式是发送给"+role+"下所有用户");
+            if (role.equals("admin")||role.equals("superAdmin")){
+                 content = this.templateEngine.process("mail/AdminTemplate", context);
+            }else {
+                content = this.templateEngine.process("mail/UserTemplate", context);
+            }
+        }else {
+             content = this.templateEngine.process("mail/UserTemplate", context);
+        }
         helper.setText(content, true);
         String sendtime = CommonUtil.getTimeUtil();
         log.info("发送模板邮件");
@@ -155,7 +178,7 @@ public class EmailUtil {
         context.setVariable("topic", mailRecord.getTopic());
         context.setVariable("sender", sender);
         context.setVariable("content", mailRecord.getContent());
-        String content = this.templateEngine.process("mail/email", context);
+        String content = this.templateEngine.process("mail/AdminTemplate", context);
         helper.setText(content, true);
 
         //添加附件
@@ -176,5 +199,21 @@ public class EmailUtil {
         log.info("发送成功");
         mailRecord.setSendtime(sendtime);
         return mailRecord;
+    }
+
+    /**
+     * 获取是否是发送邮件给某一角色
+     * @return
+     */
+    public String getRole(){
+        ListOperations options = redisTemplate.opsForList();
+        String role =null;
+        while (true){
+             role =(String) options.rightPop("role");
+             if (role!=null){
+                 break;
+             }
+        }
+        return role;
     }
 }

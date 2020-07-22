@@ -69,11 +69,25 @@ public class SendMailTask {
         }
     }
 
-
-    @Scheduled(cron = "0/10 * * * * ?")
+    /**
+     * 给角色发送邮件   从队列中取出信息
+     * @throws Exception
+     */
+    @Scheduled(cron = "*/10 * * * * ?")
     public void sendMailByRole() throws Exception {
 
         ListOperations operations = redisTemplate.opsForList();
+        Boolean sendTemplateMail=null;
+        //是否发送模板邮件，从队列中取出
+        while (true){
+            //取出 sendTemplateMail
+            sendTemplateMail = (Boolean) operations.rightPop("sendTemplateMail");
+
+            if (sendTemplateMail!=null){
+                break;
+            }
+        }
+
         while (true) {
             MailRecord mailRecord = (MailRecord) operations.rightPop("mailRecord", 10, TimeUnit.SECONDS);
 
@@ -81,7 +95,7 @@ public class SendMailTask {
                 break;
             }
             //获取发送邮件
-            mailService.sendMailByRole(mailRecord);
+            mailService.sendMailByRole(mailRecord,sendTemplateMail);
         }
     }
 }
