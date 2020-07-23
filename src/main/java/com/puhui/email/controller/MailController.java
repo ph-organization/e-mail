@@ -212,16 +212,17 @@ public class MailController {
                 ListOperations operations = redisTemplate.opsForList();
                 //将角色名放入队列
                 operations.leftPush("role", roleNote);
-                //将sendTemplateMail放入队列
 
+                //将sendTemplateMail放入队列
                 operations.leftPush("sendTemplateMail", sendTemplateMail);
+
                 //将该角色下所有用户放入队列中
-                for (MailUser user : users) {
-                    mailRecord.setTarget(user.getEmail());
+                users.forEach(str->{
+                    mailRecord.setTarget(str.getEmail());
                     mailRecord.setContent(content);
                     mailRecord.setTopic(topic);
                     operations.leftPush("mailRecord", mailRecord);
-                }
+                });
                 result.setCode("0");
                 result.setSuccess(true);
                 result.setMessage("邮件发送任务提交成功");
