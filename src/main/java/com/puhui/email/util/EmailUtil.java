@@ -93,6 +93,7 @@ public class EmailUtil {
      * 发送带附件的邮件
      */
     public MailRecord sendMimeMessge(MailRecord mailRecord, MultipartFile multipartFile) throws Exception {
+        log.info("multipartFile"+multipartFile);
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper messageHelper = new MimeMessageHelper(message, true);//true表示支持复杂类型
         messageHelper.setFrom(sender);
@@ -101,11 +102,13 @@ public class EmailUtil {
         messageHelper.setText(mailRecord.getContent(), true);
         messageHelper.setSentDate(new Date());
 
+        //对文件资源进行处理
         //获取文件名
         String fileName = multipartFile.getOriginalFilename();
         //文件路径
-        String filepath = "D:\\upload" + File.separator + fileName;
+        String filepath = "D:\\upload\\"+ fileName;
 
+        //获取到上传后的文件
         File file = new File(filepath);
 
         messageHelper.addAttachment(fileName != null ? fileName : "default.txt", file);
@@ -198,6 +201,7 @@ public class EmailUtil {
         String sendtime = CommonUtil.getTimeUtil();
         log.info("发送成功");
         mailRecord.setSendtime(sendtime);
+        mailRecord.setFilepath(filepath);
         return mailRecord;
     }
 
