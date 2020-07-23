@@ -36,7 +36,7 @@ public class SendMailTask {
     /**
      * 每天早晨9点准时给用户发送邮件  （内容自定义）
      */
-    @Scheduled(cron = "0 */10 * * * ? ") //2分钟发送一次
+//    @Scheduled(cron = "0 */10 * * * ? ") //2分钟发送一次
     public void sendEmailOnTime() {
         ListOperations opreation = redisTemplate.opsForList();
         //查询所有用户
@@ -69,7 +69,7 @@ public class SendMailTask {
         }
     }
 
-    @Scheduled(cron = "0/10 * * * * ?")
+//    @Scheduled(cron = "0/10 * * * * ?")
     public void sendMailByRole() throws Exception {
 
         ListOperations operations = redisTemplate.opsForList();

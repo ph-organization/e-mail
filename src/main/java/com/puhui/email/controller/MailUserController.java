@@ -28,10 +28,9 @@ import java.util.List;
  * @date: 2020/7/5
  */
 @RestController
-@ResponseBody
-@RequestMapping(value = "/mailUser")
 @Slf4j
-@Api(value="用户管理",tags={"用户管理接口"})
+@Api(tags={"普通管理员接口"})
+@RequestMapping(value = "/admin")
 public class MailUserController {
 
     //邮件用户实体
@@ -108,15 +107,6 @@ public class MailUserController {
         }
     }
 
-    //查询用户
-    @ApiOperation("查询当前用户的信息")
-    @GetMapping(value = "/user/queryByEmail")
-    public MailUser queryMailUser() {
-        //获取当前用户名
-        String email = SecurityGetName.getUsername();
-        return mailUserService.mailUserSelect(email);
-    }
-
     //根据邮箱模糊查询用户
     @ApiOperation("邮箱模糊查询用户的信息")
     @GetMapping(value = "/queryDimSelect")
@@ -138,21 +128,5 @@ public class MailUserController {
         return mailUserService.mailUserSelectAll();
     }
 
-    //根据当前登录的邮箱删除邮件记录
-    @ApiOperation(value = "根据当前登录的邮箱删除邮件记录")
-    @DeleteMapping(value = "/user/mailRecordDelete")
-    public void mailRecordDelete() {
-        //获取当前用户名
-        String mailUsrEmail = SecurityGetName.getUsername();
-        mailRecordService.mailRecordDelete(mailUsrEmail);
-    }
 
-    //根据当前登录的邮箱查询邮件记录
-    @ApiOperation(value = "根据当前登录的邮箱查询邮件记录")
-    @GetMapping(value = "/user/mailRecordInsert")
-    public List<MailRecord> mailRecordInsert() {
-        //获取当前用户名
-        String mailUsrEmail = SecurityGetName.getUsername();
-        return mailRecordService.mailRecordSelect(mailUsrEmail);
-    }
 }

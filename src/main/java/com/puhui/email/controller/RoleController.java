@@ -13,12 +13,9 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import sun.rmi.runtime.Log;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,10 +24,9 @@ import java.util.List;
  * @date: 2020/7/9
  */
 @RestController
-@ResponseBody
 @Slf4j
-@RequestMapping(value = "/role")
-@Api(value="超级管理员",tags={"用户管理接口"})
+@Api(tags={"超级管理员接口"})
+@RequestMapping(value = "/superAdmin")
 public class RoleController {
 
     @Resource

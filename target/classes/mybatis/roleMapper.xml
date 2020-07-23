@@ -11,10 +11,10 @@
     </select>
     <!--根据角色查询-->
     <select id="roleSelectNote" parameterType="string" resultType="com.puhui.email.entity.Role">
-        SELECT * FROM t_role WHERE  role_admin=#{role_admin};
+        SELECT * FROM t_role WHERE  role_note=#{role_note};
     </select>
     <!--根据角色查询该角色下所有用户-->
     <select id="roleSelectUser" parameterType="string" resultType="com.puhui.email.entity.MailUser">
-        SELECT mu.* FROM t_realtion res ,mail_user mu,t_role ro WHERE  res.user_id=mu.id and res.role_id=ro.id and ro.role_admin=#{role_admin};
+        SELECT mu.* FROM t_realtion res ,mail_user mu,t_role ro WHERE  res.user_id=mu.id and res.role_id=ro.id and ro.role_note=#{role_note};
     </select>
 </mapper>
