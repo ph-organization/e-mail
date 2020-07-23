@@ -36,7 +36,7 @@ public class SendMailTask {
     /**
      * 每天早晨9点准时给用户发送邮件  （内容自定义）
      */
-    @Scheduled(cron = "0 */10 * * * ? ") //2分钟发送一次
+    @Scheduled (cron = "0 */10 * * * ? ") //2分钟发送一次
     public void sendEmailOnTime() {
         ListOperations opreation = redisTemplate.opsForList();
         //查询所有用户
@@ -71,29 +71,31 @@ public class SendMailTask {
 
     /**
      * 给角色发送邮件   从队列中取出信息
+     *
      * @throws Exception
      */
-    @Scheduled(cron = "*/10 * * * * ?")
+    @Scheduled (cron = "*/10 * * * * ?")
     public void sendMailByRole() throws Exception {
-
+        int x = 0;
         ListOperations operations = redisTemplate.opsForList();
-        Boolean sendTemplateMail=null;
+        Boolean sendTemplateMail = null;
         //是否发送模板邮件，从队列中取出
-        while (true){
-            //取出 sendTemplateMail
-            sendTemplateMail = (Boolean) operations.rightPop("sendTemplateMail");
-
-            if (sendTemplateMail!=null){
+        while (x < 5) {
+            //取出 sendTemplateMail（sendTemplateMail一定会有一个值）
+            sendTemplateMail = (Boolean) operations.rightPop("sendTemplateMail", 2, TimeUnit.SECONDS);
+            if (sendTemplateMail != null) {
                 break;
             }
+            x++;
         }
 
+        log.info(sendTemplateMail + "task是否发送模板");
         while (true) {
-            MailRecord mailRecord = (MailRecord) operations.rightPop("mailRecord", 10, TimeUnit.SECONDS);
-
+            MailRecord mailRecord = (MailRecord) operations.rightPop("mailRecord", 3, TimeUnit.SECONDS);
             if (mailRecord == null) {
                 break;
             }
+            log.info(mailRecord + "2");
             //获取发送邮件
             mailService.sendMailByRole(mailRecord,sendTemplateMail);
         }
