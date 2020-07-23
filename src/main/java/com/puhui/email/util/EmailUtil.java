@@ -43,6 +43,7 @@ public class EmailUtil {
 
     /**
      * 发送普通邮件
+     *
      * @param mailRecord
      * @return
      */
@@ -92,8 +93,8 @@ public class EmailUtil {
     /**
      * 发送带附件的邮件
      */
-    public MailRecord sendMimeMessge(MailRecord mailRecord, MultipartFile multipartFile) throws Exception {
-        log.info("multipartFile"+multipartFile);
+    public MailRecord sendMimeMessge(MailRecord mailRecord) throws Exception {
+        log.info("multipartFile" + mailRecord.getFilepath());
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper messageHelper = new MimeMessageHelper(message, true);//true表示支持复杂类型
         messageHelper.setFrom(sender);
@@ -103,21 +104,18 @@ public class EmailUtil {
         messageHelper.setSentDate(new Date());
 
         //对文件资源进行处理
-        //获取文件名
-        String fileName = multipartFile.getOriginalFilename();
-        //文件路径
-        String filepath = "D:\\upload\\"+ fileName;
 
         //获取到上传后的文件
-        File file = new File(filepath);
-
+        File file = new File(mailRecord.getFilepath());
+        //获取文件名
+        String fileName = file.getName();
+        log.info(fileName);
         messageHelper.addAttachment(fileName != null ? fileName : "default.txt", file);
 
         //发送邮件
         String sendtime = CommonUtil.getTimeUtil();
         mailSender.send(message);
         mailRecord.setSendtime(sendtime);
-        mailRecord.setFilepath(filepath);
         return mailRecord;
     }
 
@@ -127,7 +125,7 @@ public class EmailUtil {
     public MailRecord sendTemplateMail(MailRecord mailRecord) throws Exception {
         //获取角色名（只有根据角色发送才不为空）
         String role = getRole();
-        log.info("发送邮件工具类中获取到的角色是"+role);
+        log.info("发送邮件工具类中获取到的角色是" + role);
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
         helper.setFrom(sender);
@@ -138,16 +136,16 @@ public class EmailUtil {
         context.setVariable("topic", mailRecord.getTopic());
         context.setVariable("sender", sender);
         context.setVariable("content", mailRecord.getContent());
-        String content=null;
-        if (role!=null){
-            log.info("该发送方式是发送给"+role+"下所有用户");
-            if (role.equals("admin")||role.equals("superAdmin")){
-                 content = this.templateEngine.process("mail/AdminTemplate", context);
-            }else {
+        String content = null;
+        if (role != null) {
+            log.info("该发送方式是发送给" + role + "下所有用户");
+            if (role.equals("admin") || role.equals("superAdmin")) {
+                content = this.templateEngine.process("mail/AdminTemplate", context);
+            } else {
                 content = this.templateEngine.process("mail/UserTemplate", context);
             }
-        }else {
-             content = this.templateEngine.process("mail/UserTemplate", context);
+        } else {
+            content = this.templateEngine.process("mail/UserTemplate", context);
         }
         helper.setText(content, true);
         String sendtime = CommonUtil.getTimeUtil();
@@ -160,13 +158,14 @@ public class EmailUtil {
 
     /**
      * 发送带附件的模板邮件
+     *
      * @param mailRecord
-     * @param multipartFile
+
      * @return
      * @throws Exception
      */
 
-    public MailRecord sendMailWithTempalteandFile(MailRecord mailRecord, MultipartFile multipartFile) throws Exception {
+    public MailRecord sendMailWithTempalteandFile(MailRecord mailRecord) throws Exception {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
         //设置发件人
@@ -186,12 +185,13 @@ public class EmailUtil {
 
         //添加附件
 
-        //获取文件名
-        String fileName = multipartFile.getOriginalFilename();
+
         //文件路径
-        String filepath = "D:\\upload" + File.separator + fileName;
+        String filepath = mailRecord.getFilepath();
 
         File file = new File(filepath);
+        String fileName=file.getName();
+
 
         helper.addAttachment(fileName != null ? fileName : "default.txt", file);
 
@@ -201,22 +201,22 @@ public class EmailUtil {
         String sendtime = CommonUtil.getTimeUtil();
         log.info("发送成功");
         mailRecord.setSendtime(sendtime);
-        mailRecord.setFilepath(filepath);
         return mailRecord;
     }
 
     /**
      * 获取是否是发送邮件给某一角色
+     *
      * @return
      */
-    public String getRole(){
+    public String getRole() {
         ListOperations options = redisTemplate.opsForList();
-        String role =null;
-        while (true){
-             role =(String) options.rightPop("role");
-             if (role!=null){
-                 break;
-             }
+        String role = null;
+        while (true) {
+            role = (String) options.rightPop("role");
+            if (role != null) {
+                break;
+            }
         }
         return role;
     }
