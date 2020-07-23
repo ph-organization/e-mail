@@ -11,6 +11,7 @@ import com.puhui.email.service.MessageService;
 import com.puhui.email.service.RoleService;
 import com.puhui.email.util.AESUtil;
 import com.puhui.email.util.BaseResult;
+import com.puhui.email.util.FileUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -20,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -52,12 +54,13 @@ public class MailController {
 
     /**
      * 指定用户发送邮件接口
-     * @param target    邮件发送目标姓名
-     * @param topic    邮件主题
-     * @param content       邮件内容
-     * @param multipartFile       添加的附件
-     * @param sendTemplateMail   是否使用模板发送邮件（默认不使用）
-     * @param sendMessage   是否同时发送短信（默认不发送）
+     *
+     * @param target           邮件发送目标姓名
+     * @param topic            邮件主题
+     * @param content          邮件内容
+     * @param multipartFile    添加的附件
+     * @param sendTemplateMail 是否使用模板发送邮件（默认不使用）
+     * @param sendMessage      是否同时发送短信（默认不发送）
      * @return
      * @throws Exception
      */
@@ -72,17 +75,25 @@ public class MailController {
     @PostMapping ("/mail/sendMail")
     public BaseResult sendSimpleMail(String target, String topic, String content, MultipartFile multipartFile, Boolean sendTemplateMail, Boolean sendMessage) throws Exception {
 
-
-        log.info(sendTemplateMail.toString() + "-----------------------");
         //根据用户名查询用户
         MailUser user = mailUserService.queryUserByName(target);
+        String filePath =null;
         if (user != null) {
+            if (multipartFile!=null) {
+                 filePath = FileUtil.fileUpload(multipartFile);
+                 log.info(filePath);
+            }
             //封装短信信息
             //新建一个短信对象
             Message message = new Message();
-            message.setTargetphone(AESUtil.decrypt(user.getPhone()));
-            message.setTarget(target);
-            message.setContent(content);
+            message.setTargetphone(AESUtil.decrypt(user.getPhone())); //收件人电话号码
+            message.setTarget(target); //收件人姓名
+            message.setContent(content);//邮件内容
+            
+            //新建一个邮件对象
+            MailRecord mailRecord = new MailRecord();
+            mailRecord.setFilepath(filePath);//附件路径
+
             //获取  redis数据库 中对用户名缓存的标识码
             String redisNameCode = redisTemplates.opsForValue().get(user.getName());
 
@@ -109,7 +120,7 @@ public class MailController {
                 }
                 result.setCode("1");
                 result.setSuccess(false);
-                result.setMessage("由于邮件资源有限，请明天再发送邮件");
+                result.setMessage("您的邮件发送频率过高，请稍后再试");
                 return result;
             }
             //判断该邮箱当天是否已经成功发送过一次邮件
@@ -129,21 +140,21 @@ public class MailController {
                 }
                 result.setCode("1");
                 result.setSuccess(false);
-                result.setMessage("您的邮件发送频率过高，请稍后再试");
+                result.setMessage("由于邮箱资源有限，同一用户邮箱每天只能发送一次邮件");
                 return result;
             }
 
             if (sendMessage) {
                 if (phoneCode != null) {
                     //邮件能发送，短信不能发送
-                    mailService.sendSimpleMail(user, topic, content, multipartFile, sendTemplateMail);
+                    mailService.sendSimpleMail(user, mailRecord, sendTemplateMail);
                     result.setCode("1");
                     result.setSuccess(false);
                     result.setMessage("您的邮件发送请求已提交；短信发送频率过高，请稍后再试");
                     return result;
                 }
                 //都能发送
-                mailService.sendSimpleMail(user, topic, content, multipartFile, sendTemplateMail);
+                mailService.sendSimpleMail(user, mailRecord, sendTemplateMail);
                 messageService.sendMessage(message);
                 result.setSuccess(true);
                 result.setCode("0");
@@ -151,7 +162,7 @@ public class MailController {
                 return result;
             }
 
-            mailService.sendSimpleMail(user, topic, content, multipartFile, sendTemplateMail);
+            mailService.sendSimpleMail(user, mailRecord, sendTemplateMail);
             result.setSuccess(true);
             result.setCode("0");
             result.setMessage("已提交邮件发送");
@@ -179,7 +190,7 @@ public class MailController {
             @ApiImplicitParam (name = "topic", value = "邮件主题", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam (name = "content", value = "邮件内容", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam (name = "sendTemplateMail", value = "是否使用模板发送", required = false, dataType = "Boolean", paramType = "query", defaultValue = "false")
-           // @ApiImplicitParam (name = "sendMessage", value = "是否发送短信", required = false, dataType = "Boolean", paramType = "query", defaultValue = "false")
+            // @ApiImplicitParam (name = "sendMessage", value = "是否发送短信", required = false, dataType = "Boolean", paramType = "query", defaultValue = "false")
     })
     @PostMapping ("/mail/sendEmailByRole")
     public BaseResult sendEmailByRole(String roleNote, String content, String topic, Boolean sendTemplateMail) {
@@ -200,10 +211,10 @@ public class MailController {
 
                 ListOperations operations = redisTemplate.opsForList();
                 //将角色名放入队列
-                operations.leftPush("role",roleNote);
+                operations.leftPush("role", roleNote);
                 //将sendTemplateMail放入队列
 
-                operations.leftPush("sendTemplateMail",sendTemplateMail);
+                operations.leftPush("sendTemplateMail", sendTemplateMail);
                 //将该角色下所有用户放入队列中
                 for (MailUser user : users) {
                     mailRecord.setTarget(user.getEmail());

@@ -60,7 +60,7 @@ public class MailServiceImpl implements MailService {
      * 发送普通邮件接口
      */
     @Async (value = "taskExecutors")
-    public void sendSimpleMail(MailUser user, String topic, String content, MultipartFile multipartFile, Boolean sendTemplateMail) throws Exception {
+    public void sendSimpleMail(MailUser user, MailRecord mailRecord, Boolean sendTemplateMail) throws Exception {
         //获取登录用户的email信息
         String loginUserEmail =(String) template.opsForValue().get("LoginUserEmail");
 
@@ -72,8 +72,6 @@ public class MailServiceImpl implements MailService {
         //将用户名对应的缓存符放入到redis数据库   设置30分钟失效
         template.opsForValue().set(user.getName(), nameCode, 30, TimeUnit.MINUTES);
 
-
-        MailRecord mailRecord = new MailRecord();
         //设置邮件发件人,是当前登录的用户邮箱
         mailRecord.setEmail(loginUserEmail);
         //邮件发送的目标用户
@@ -83,18 +81,17 @@ public class MailServiceImpl implements MailService {
         //设置邮件内容
         mailRecord.setContent(content);
 
-
             try {
                 //发送邮件
                 log.info("发送邮件给：" + mailRecord.toString());
-                if (multipartFile!=null&&sendTemplateMail){
+                if (mailRecord.getFilepath()!=null&&sendTemplateMail){
                     //发送带附件的模板邮件
                     log.info("发送带附件的模板邮件给"+user.getName());
-                    mailRecord = emailUtil.sendMailWithTempalteandFile(mailRecord, multipartFile);
-                }else if (multipartFile!=null){
+                    mailRecord = emailUtil.sendMailWithTempalteandFile(mailRecord);
+                }else if (mailRecord.getFilepath()!=null){
                     //如果有文件内容,发送附件邮件
                     log.info("发送带附件的邮件给"+user.getName());
-                    mailRecord = emailUtil.sendMimeMessge(mailRecord, multipartFile);
+                    mailRecord = emailUtil.sendMimeMessge(mailRecord);
                 }else if (sendTemplateMail){
                     //如果为true，发送模板邮件
                     log.info("发送模板邮件给"+user.getName());

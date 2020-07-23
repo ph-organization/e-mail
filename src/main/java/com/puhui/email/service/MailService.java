@@ -12,10 +12,9 @@ import org.springframework.web.multipart.MultipartFile;
 public interface MailService {
     /**
      *发送文本邮件
-     * @param topic    主题
-     * @param content    内容
+
      */
-    public void sendSimpleMail(MailUser user, String topic, String content, MultipartFile multipartFile, Boolean sendTemplateMail) throws Exception;
+    public void sendSimpleMail(MailUser user, MailRecord mailRecord, Boolean sendTemplateMail) throws Exception;
 
     /**
      *根据角色发送邮件
