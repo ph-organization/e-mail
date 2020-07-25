@@ -31,7 +31,7 @@ public class RoleServiceImpl implements RoleService {
     //根据用户邮箱查询自己的角色
     @Override
     public List<Role> roleSelect(String email) {
-        if (email == null || email.replaceAll(" +", "").equals("")) {
+        if (email == null || "".equals(email.replaceAll(" +", ""))) {
             log.info("请输入有效值");
             return null;
         } else {
@@ -49,7 +49,7 @@ public class RoleServiceImpl implements RoleService {
     //根据角色名查询
     @Override
     public Role roleSelectNote(String roleName) {
-        if (roleName == null || roleName.replaceAll(" +", "").equals("")) {
+        if (roleName == null || "".equals(roleName.replaceAll(" +", ""))) {
             log.info("请输入有效值");
             return null;
         } else {
@@ -60,13 +60,13 @@ public class RoleServiceImpl implements RoleService {
     //根据角色名查询该角色下的所有用户
     @Override
     public List<MailUser> roleSelectRelation(String roleName) {
-        if (roleName == null || roleName.replaceAll(" +", "").equals("")) {
+        if (roleName == null || "".equals(roleName.replaceAll(" +", ""))) {
             log.info("请输入有效值");
             return null;
         } else {
             //那到拥有该角色的所有用户
             List<MailUser> mList = roleMapper.roleSelectUser(roleName);
-            return mList.stream().filter(mailUser -> mailUser.getLose_user().equals("true")).collect(Collectors.toList());
+            return mList.stream().filter(mailUser -> "true".equals(mailUser.getLose_user())).collect(Collectors.toList());
         }
     }
 }

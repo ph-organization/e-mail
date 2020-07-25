@@ -2,6 +2,7 @@ package com.puhui.email.service.serviceImpl;
 
 import com.puhui.email.entity.MailRecord;
 import com.puhui.email.entity.MailUser;
+import com.puhui.email.manager.EmailManager;
 import com.puhui.email.mapper.MailUserMapper;
 import com.puhui.email.service.MailRecordService;
 import com.puhui.email.service.MailService;
@@ -9,14 +10,12 @@ import com.puhui.email.service.MailUserService;
 import com.puhui.email.service.RoleService;
 import com.puhui.email.util.BaseResult;
 import com.puhui.email.util.CommonUtil;
-import com.puhui.email.util.EmailUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -46,7 +45,7 @@ public class MailServiceImpl implements MailService {
     @Value ("${mail.fromMail.sender}")
     private String sender;
     @Autowired
-    private EmailUtil emailUtil;
+    private EmailManager emailManager;
 
     //获取内容
     @Value ("${mail.send.content}")
@@ -59,6 +58,7 @@ public class MailServiceImpl implements MailService {
     /**
      * 发送普通邮件接口
      */
+
     @Async (value = "taskExecutors")
     public void sendSimpleMail(MailUser user, MailRecord mailRecord, Boolean sendTemplateMail) throws Exception {
         //获取登录用户的email信息
@@ -84,22 +84,23 @@ public class MailServiceImpl implements MailService {
             try {
                 //发送邮件
                 log.info("发送邮件给：" + mailRecord.toString());
+
                 if (mailRecord.getFilepath()!=null&&sendTemplateMail){
                     //发送带附件的模板邮件
                     log.info("发送带附件的模板邮件给"+user.getName());
-                    mailRecord = emailUtil.sendMailWithTempalteandFile(mailRecord);
+                    mailRecord = emailManager.sendMailWithTempalteandFile(mailRecord);
                 }else if (mailRecord.getFilepath()!=null){
                     //如果有文件内容,发送附件邮件
                     log.info("发送带附件的邮件给"+user.getName());
-                    mailRecord = emailUtil.sendMimeMessge(mailRecord);
+                    mailRecord = emailManager.sendMimeMessge(mailRecord);
                 }else if (sendTemplateMail){
                     //如果为true，发送模板邮件
                     log.info("发送模板邮件给"+user.getName());
-                    mailRecord = emailUtil.sendTemplateMail(mailRecord);
+                    mailRecord = emailManager.sendTemplateMail(mailRecord);
                 }else {
                     //发送普通邮件
                     log.info("发送普通邮件给"+user.getName());
-                    mailRecord = emailUtil.sendSimpleEmail(mailRecord);
+                    mailRecord = emailManager.sendSimpleEmail(mailRecord);
                 }
                 mailRecord.setResult("success");
                 log.info("返回的对象是" + mailRecord);
@@ -142,7 +143,7 @@ public class MailServiceImpl implements MailService {
         //获取用户登录email信息
         String loginUserEmail = (String) template.opsForValue().get("LoginUserEmail");
 
-        mailRecord.setTopic(mailRecord.getTopic()+"（给角色发送的邮件）");
+        mailRecord.setTopic(mailRecord.getTopic()+"（:给角色发送的邮件）");
         mailRecord.setEmail(loginUserEmail);
         try {
             //调用发送邮件工具类
@@ -150,12 +151,12 @@ public class MailServiceImpl implements MailService {
                 //发送模板邮件
                 log.info("发送模板邮件");
                 log.info(mailRecord+"");
-                mailRecord = emailUtil.sendTemplateMail(mailRecord);
+                mailRecord = emailManager.sendTemplateMail(mailRecord);
 
             }else {
                 //发送普通邮件
                 log.info("发送普通邮件");
-                mailRecord = emailUtil.sendSimpleEmail(mailRecord);
+                mailRecord = emailManager.sendSimpleEmail(mailRecord);
             }
 
 
@@ -201,7 +202,7 @@ public class MailServiceImpl implements MailService {
         mailRecord.setEmail(loginUserEmail);
         try {
             //发送邮件
-            mailRecord = emailUtil.sendSimpleEmail(mailRecord);
+            mailRecord = emailManager.sendSimpleEmail(mailRecord);
             //保存数据库
             mailRecord.setResult("success");
             log.info("邮件接收人" + target + "主题" + topic + "内容" + content + "邮件发送成功");

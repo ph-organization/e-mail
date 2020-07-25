@@ -74,25 +74,22 @@ public class MailController {
     })
     @PostMapping ("/mail/sendMail")
     public BaseResult sendSimpleMail(String target, String topic, String content, MultipartFile multipartFile, Boolean sendTemplateMail, Boolean sendMessage) throws Exception {
-
-        //根据用户名查询用户
+        //根据用户名查询用户(数据是加密的)
         MailUser user = mailUserService.queryUserByName(target);
-        String filePath =null;
+        String filePath = null;
         if (user != null) {
-            if (multipartFile!=null) {
-                 filePath = FileUtil.fileUpload(multipartFile);
-                 log.info(filePath);
-            }
+
             //封装短信信息
-            //新建一个短信对象
             Message message = new Message();
-            message.setTargetphone(AESUtil.decrypt(user.getPhone())); //收件人电话号码
-            message.setTarget(target); //收件人姓名
-            message.setContent(content);//邮件内容
-            
+            //收件人电话号码(需要解密)
+            message.setTargetphone(AESUtil.decrypt(user.getPhone()));
+            //收件人姓名
+            message.setTarget(target);
+            //邮件内容
+            message.setContent(content);
             //新建一个邮件对象
             MailRecord mailRecord = new MailRecord();
-            mailRecord.setFilepath(filePath);//附件路径
+
 
             //获取  redis数据库 中对用户名缓存的标识码
             String redisNameCode = redisTemplates.opsForValue().get(user.getName());
@@ -108,27 +105,25 @@ public class MailController {
                 if (sendMessage) {
                     if (phoneCode != null) {
                         //都不能发送
-                        result.setCode("1");
                         result.setSuccess(false);
                         result.setMessage("您的邮件和短信发送频率过高，请稍后再试");
                         return result;
                     }
                     //邮件发送失败，短信发送成功
-                      messageService.sendMessage(message);
+                    messageService.sendMessage(message);
                     result.setMessage("您的邮件发送频率过高，请稍后再试；短信发送请求已提交");
                     return result;
                 }
-                result.setCode("1");
                 result.setSuccess(false);
                 result.setMessage("您的邮件发送频率过高，请稍后再试");
                 return result;
             }
             //判断该邮箱当天是否已经成功发送过一次邮件
             if (redisEmailCode != null) {
+
                 if (sendMessage) {
                     if (phoneCode != null) {
                         //都不能发送
-                        result.setCode("1");
                         result.setSuccess(false);
                         result.setMessage("您的邮件和短信发送频率过高，请稍后再试");
                         return result;
@@ -138,17 +133,22 @@ public class MailController {
                     result.setMessage("由于邮箱资源有限，同一用户邮箱每天只能发送一次邮件；短信发送请求已提交");
                     return result;
                 }
-                result.setCode("1");
                 result.setSuccess(false);
                 result.setMessage("由于邮箱资源有限，同一用户邮箱每天只能发送一次邮件");
                 return result;
             }
+            //保证能够发送邮件的情况下才去上传文件
+            if (multipartFile != null) {
+                filePath = FileUtil.fileUpload(multipartFile);
+                //附件路径
+                mailRecord.setFilepath(filePath);
+            }
+
 
             if (sendMessage) {
                 if (phoneCode != null) {
                     //邮件能发送，短信不能发送
                     mailService.sendSimpleMail(user, mailRecord, sendTemplateMail);
-                    result.setCode("1");
                     result.setSuccess(false);
                     result.setMessage("您的邮件发送请求已提交；短信发送频率过高，请稍后再试");
                     return result;
@@ -157,21 +157,17 @@ public class MailController {
                 mailService.sendSimpleMail(user, mailRecord, sendTemplateMail);
                 messageService.sendMessage(message);
                 result.setSuccess(true);
-                result.setCode("0");
                 result.setMessage("已提交邮件发送请求和短信发送请求");
                 return result;
             }
 
             mailService.sendSimpleMail(user, mailRecord, sendTemplateMail);
             result.setSuccess(true);
-            result.setCode("0");
             result.setMessage("已提交邮件发送");
-            log.info("提交请求成功");
             return result;
         }
         //用户不存在的情况下，对结果集进行封装返回
         result.setSuccess(false);
-        result.setCode("1");
         result.setMessage("该用户不存在，请核对用户名是否正确");
         return result;
     }
@@ -210,17 +206,21 @@ public class MailController {
                 List<MailUser> users = mailUserService.mailUserSelectByRole(role.getId());
 
                 ListOperations operations = redisTemplate.opsForList();
-                //将角色名放入队列
-                operations.leftPush("role", roleNote);
 
-                //将sendTemplateMail放入队列
-                operations.leftPush("sendTemplateMail", sendTemplateMail);
+              if (sendTemplateMail){
+                  //将角色名放入队列
+
+                  operations.leftPush("sendTemplateMailByRole", sendTemplateMail);
+              }
 
                 //将该角色下所有用户放入队列中
-                users.forEach(str->{
+                users.forEach(str -> {
                     mailRecord.setTarget(str.getEmail());
                     mailRecord.setContent(content);
                     mailRecord.setTopic(topic);
+
+                    //将sendTemplateMail放入队列,一个用户对应一个角色
+                    operations.leftPush("role", roleNote);
                     operations.leftPush("mailRecord", mailRecord);
                 });
                 result.setCode("0");
