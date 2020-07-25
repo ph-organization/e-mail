@@ -1,5 +1,6 @@
 package com.puhui.email.service.serviceImpl;
 
+import com.puhui.email.entity.MailUseRelationRoleGroup;
 import com.puhui.email.entity.Relation;
 import com.puhui.email.mapper.MailRecordMapper;
 import com.puhui.email.mapper.RelationMapper;
@@ -21,15 +22,39 @@ public class RelationServiceImpl implements RelationService {
     @Resource
     RelationMapper relationMapper;
 
-    //添加用户与角色的关联
+    /**
+     * //添加用户与角色的关联
+     * @param relation
+     */
     @Override
     public void relationInsert(Relation relation) {
         relationMapper.relationInsert(relation);
     }
 
-    //删除关联
+    /**
+     * //删除用户与角色的关联
+     * @param relation
+     */
     @Override
     public void relationDelete(Relation relation) {
         relationMapper.relationDelete(relation);
+    }
+
+    /**
+     * 添加邮件用户与角色组的关系
+     * @param mailUseRelationRoleGroup
+     */
+    @Override
+    public void roleGroupRelationAdd(MailUseRelationRoleGroup mailUseRelationRoleGroup) {
+        relationMapper.roleGroupRelationAdd(mailUseRelationRoleGroup);
+    }
+
+    /**
+     * 删除与角色组的关系
+     * @param mailUseRelationRoleGroup
+     */
+    @Override
+    public void roleGroupRelationDelete(MailUseRelationRoleGroup mailUseRelationRoleGroup) {
+        relationMapper.roleGroupRelationDelete(mailUseRelationRoleGroup);
     }
 }

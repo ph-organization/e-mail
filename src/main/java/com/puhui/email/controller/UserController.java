@@ -26,36 +26,29 @@ import java.util.List;
 @RequestMapping(value = "/user")
 public class UserController {
 
-    //邮件用户实体
     @Resource
     MailUserService mailUserService;
-    //邮件记录实体
     @Resource
     MailRecordService mailRecordService;
-    //查询用户
+
     @ApiOperation("查询当前用户的信息")
     @GetMapping(value = "/queryByEmail")
-    @PreAuthorize("hasAnyRole('ROLE_user','ROLE_admin','ROLE_superAdmin')")
     public MailUser queryMailUser() {
         //获取当前用户名
         String email = SecurityGetName.getUsername();
         return mailUserService.mailUserSelect(email);
     }
 
-    //根据当前登录的邮箱删除邮件记录
     @ApiOperation(value = "根据当前登录的邮箱删除邮件记录")
     @DeleteMapping(value = "/mailRecordDelete")
-    @PreAuthorize("hasAnyRole('ROLE_user','ROLE_admin','ROLE_superAdmin')")
     public void mailRecordDelete() {
         //获取当前用户名
         String mailUsrEmail = SecurityGetName.getUsername();
         mailRecordService.mailRecordDelete(mailUsrEmail);
     }
 
-    //根据当前登录的邮箱查询邮件记录
     @ApiOperation(value = "根据当前登录的邮箱查询邮件记录")
     @GetMapping(value = "/mailRecordInsert")
-    @PreAuthorize("hasAnyRole('ROLE_user','ROLE_admin','ROLE_superAdmin')")
     public List<MailRecord> mailRecordInsert() {
         //获取当前用户名
         String mailUsrEmail = SecurityGetName.getUsername();

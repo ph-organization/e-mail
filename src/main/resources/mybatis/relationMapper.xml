@@ -4,19 +4,35 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <!--namespace mapper接口 必填 随便填值 防止SQL语句ID重名-->
 <mapper namespace="com.puhui.email.mapper.RelationMapper">
-
-    <parameterMap id="relationPOJO" type="com.puhui.email.mapper.RelationMapper">
+    <!--邮件用户与角色关联-->
+    <parameterMap id="mailUserRelationRole" type="com.puhui.email.mapper.RelationMapper">
+        <parameter property="user_id" javaType="integer"></parameter>
+        <parameter property="role_id" javaType="integer"></parameter>
+    </parameterMap>
+    <!--邮件用户与角色组关联-->
+    <parameterMap id="mailUserRelationRoleGroup" type="com.puhui.email.entity.MailUseRelationRoleGroup">
         <parameter property="user_id" javaType="integer"></parameter>
         <parameter property="role_id" javaType="integer"></parameter>
     </parameterMap>
 
     <!--    //添加关联-->
-    <insert id="relationInsert" parameterType="com.puhui.email.entity.Relation">
+    <insert id="relationInsert" parameterMap="mailUserRelationRole">
         INSERT INTO t_realtion(user_id,role_id)
                 VALUES(#{user_id},#{role_id})
     </insert>
     <!--    //删除关联-->
-    <delete id="relationDelete" parameterMap="relationPOJO">
+    <delete id="relationDelete" parameterMap="mailUserRelationRole">
         DELETE  FROM t_realtion WHERE  user_id=#{user_id} and role_id=#{role_id};
+    </delete>
+
+    <!--添加与角色组的关联-->
+    <insert id="roleGroupRelationAdd" parameterMap="mailUserRelationRoleGroup">
+        INSERT INTO mailuser_rolegroup(mailuser_id,role_group_id)
+                VALUES (#{mailuser_id},#{role_group_id})
+    </insert>
+    <!--删除与角色组的关联-->
+    <delete id="roleGroupRelationDelete" parameterMap="mailUserRelationRoleGroup">
+        DELETE  FROM mailuser_rolegroup
+            WHERE  mailuser_id=#{mailuser_id} and role_group_id=#{role_group_id};
     </delete>
 </mapper>

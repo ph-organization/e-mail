@@ -10,5 +10,9 @@ import java.util.List;
  * @date: 2020/7/21
  */
 public interface MenuMapper {
+    /**
+     * 拿到菜单全部信息
+     * @return
+     */
     List<Menu> getAllMenu();
 }

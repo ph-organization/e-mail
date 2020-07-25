@@ -1,9 +1,6 @@
 package com.puhui.email.controller;
 
-import com.puhui.email.entity.MailRecord;
-import com.puhui.email.entity.MailUser;
-import com.puhui.email.entity.Relation;
-import com.puhui.email.entity.Role;
+import com.puhui.email.entity.*;
 import com.puhui.email.service.MailRecordService;
 import com.puhui.email.service.MailUserService;
 import com.puhui.email.service.RelationService;
@@ -38,18 +35,16 @@ public class RoleController {
     @Resource
     MailRecordService mailRecordService;
 
-    ////根据角色名查询该角色下的所有用户
     @ApiOperation(value = "根据角色名查询该角色下的所有用户")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "roleName", value = "权限名（superAdmin,admin,user）", required = false, dataType = "String", paramType = "query")
     })
     @GetMapping(value = "/roleSelectRelation")
     public List<MailUser> roleSelectRelation(String roleName) {
-        List<MailUser> relations = roleService.roleSelectRelation(roleName);
-        return relations;
+        List<MailUser> roleMailUser = roleService.roleSelectRelation(roleName);
+        return roleMailUser;
     }
 
-    //查询角色
     @ApiOperation(value = "根据用户邮箱查询该用户担任的所有角色")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "Email", value = "邮箱", required = false, dataType = "String", paramType = "query")
@@ -60,7 +55,6 @@ public class RoleController {
     }
 
 
-    //添加关系
     @ApiOperation(value = "根据Email添加关联")
     @PostMapping(value = "/relationInsert")
     @ApiImplicitParams({
@@ -71,14 +65,11 @@ public class RoleController {
         //先查寻用户id和角色id 在赋值添加关系
         MailUser mailUser = mailUserService.mailUserSelect(mailUsrEmail);
         Role role = roleService.roleSelectNote(roleName);
-        if (mailUser == null || role == null) {
-            return;
-        } else {
+        if (!(mailUser == null || role == null)) {
             relationService.relationInsert(new Relation(mailUser.getId(), role.getId()));
         }
     }
 
-    //根据用户邮箱删除与某角色关联
     @ApiOperation(value = "根据用户邮箱删除关联")
     @DeleteMapping(value = "/relationDelete")
     @ApiImplicitParams({
@@ -89,25 +80,36 @@ public class RoleController {
         //根据用户名查询用户id，再根据用户id删除关系
         MailUser mailUser = mailUserService.mailUserSelect(mailUsrEmail);
         Role role = roleService.roleSelectNote(roleName);
-        if (mailUser == null || role == null) {
-            return;
-        } else {
+        if (!(mailUser == null || role == null)) {
             relationService.relationDelete(new Relation(mailUser.getId(), role.getId()));
         }
     }
 
-    //根据邮箱删除邮件记录
-    @ApiOperation(value = "根据邮箱删除邮件记录")
-    @DeleteMapping(value = "/mailRecordDelete")
-    public void mailRecordDelete(String email) {
-        mailRecordService.mailRecordDelete(email);
+    @ApiOperation(value = "添加邮件用户与角色组的关系")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "email", value = "用户邮箱", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "roleGroupName", value = "角色组名（superAdmin,admin,user）", required = false, dataType = "String", paramType = "query")
+    })
+    @PostMapping(name = "/roleGroupRelationAdd")
+    public void roleGroupRelationAdd(String email, String roleGroupName) {
+        MailUser mailUser = mailUserService.mailUserSelect(email);
+        RoleGroup roleGroup = roleService.roleGroupSelectByRoleGroupName(roleGroupName);
+        if (!(mailUser == null || roleGroup == null)) {
+            relationService.roleGroupRelationAdd(new MailUseRelationRoleGroup(mailUser.getId(), roleGroup.getId()));
+        }
     }
 
-    //根据邮箱查询邮件记录
-    @ApiOperation(value = "根据邮箱查询邮件记录")
-    @GetMapping(value = "/mailRecordInsert")
-    public List<MailRecord> mailRecordInsert(String email) {
-        return mailRecordService.mailRecordSelect(email);
+    @ApiOperation(value = "删除与角色组的关系")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "email", value = "用户邮箱", required = false, dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "roleGroupName", value = "角色组名（superAdmin,admin,user）", required = false, dataType = "String", paramType = "query")
+    })
+    @DeleteMapping(name = "/roleGroupRelationDelete")
+    public void roleGroupRelationDelete(String email, String roleGroupName) {
+        MailUser mailUser = mailUserService.mailUserSelect(email);
+        RoleGroup roleGroup = roleService.roleGroupSelectByRoleGroupName(roleGroupName);
+        if (!(mailUser == null || roleGroup == null)) {
+            relationService.roleGroupRelationDelete(new MailUseRelationRoleGroup(mailUser.getId(), roleGroup.getId()));
+        }
     }
-
 }

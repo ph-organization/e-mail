@@ -35,7 +35,10 @@ public class MailUserServiceImpl implements MailUserService {
     @Resource
     RoleService roleService;
 
-    //添加单个用户
+    /**
+     * //添加单个用户
+     * @param mailUser
+     */
     @Override
     public void mailUserInsert(MailUser mailUser) {
         if (mailUser.getName() != null && mailUser.getEmail() != null && mailUser.getBirthday() != null && mailUser.getAddress() != null && mailUser.getPhone() != null && mailUser.getSex() != null && mailUser.getPwd() != null) {
@@ -68,7 +71,10 @@ public class MailUserServiceImpl implements MailUserService {
         }
     }
 
-    //根据email逻辑删除的单个用户
+    /**
+     * //根据email逻辑删除的单个用户
+     * @param email
+     */
     @Override
     public void mailUserLogicDelete(String email) {
         if (email == null || email.replaceAll(" +", "").equals("")) {
@@ -86,7 +92,10 @@ public class MailUserServiceImpl implements MailUserService {
         }
     }
 
-    //逻辑删除多个
+    /**
+     *  //逻辑删除多个
+     * @param ids
+     */
     @Override
     public void mailUserLogicDeleteS(List<Integer> ids) {
         if (ids != null) {
@@ -97,7 +106,10 @@ public class MailUserServiceImpl implements MailUserService {
     }
 
 
-    //根据email修改单个
+    /**
+     * //根据email修改单个
+     * @param mailUser
+     */
     @Override
     public void mailUserUpdate(MailUser mailUser) {
         if (mailUser.getName() != null && mailUser.getEmail() != null && mailUser.getBirthday() != null && mailUser.getAddress() != null && mailUser.getPhone() != null && mailUser.getSex() != null && mailUser.getPwd() != null) {
@@ -122,7 +134,10 @@ public class MailUserServiceImpl implements MailUserService {
         }
     }
 
-    //添加逻辑删除后的用户(重启逻辑删除后的用户)
+    /**
+     * //添加逻辑删除后的用户(重启逻辑删除后的用户)
+     * @param mailUser
+     */
     @Override
     public void mailUserRestart(MailUser mailUser) {
         if (mailUser.getName() != null && mailUser.getEmail() != null && mailUser.getBirthday() != null && mailUser.getAddress() != null && mailUser.getPhone() != null && mailUser.getSex() != null && mailUser.getPwd() != null) {
@@ -149,7 +164,11 @@ public class MailUserServiceImpl implements MailUserService {
     }
 
 
-    //根据email查询单个(返回有效用户)
+    /**
+     * //根据email查询单个(返回有效用户)
+     * @param email
+     * @return
+     */
     @Override
     public MailUser mailUserSelect(String email) {
         if (email == null || email.replaceAll(" +", "").equals("")) {
@@ -168,7 +187,11 @@ public class MailUserServiceImpl implements MailUserService {
         }
     }
 
-    //根据email查询单个(返回失效用户)
+    /**
+     * //根据email查询单个(返回失效用户)
+     * @param email
+     * @return
+     */
     @Override
     public MailUser mailUserFailed(String email) {
         if (email == null || email.replaceAll(" +", "").equals("")) {
@@ -188,7 +211,10 @@ public class MailUserServiceImpl implements MailUserService {
     }
 
 
-    //查询全部
+    /**
+     * //查询全部
+     * @return
+     */
     @Override
     public List<MailUser> mailUserSelectAll() {
         //拿到全部用户
@@ -197,7 +223,11 @@ public class MailUserServiceImpl implements MailUserService {
         return list.stream().filter(mailUser -> mailUser.getLose_user().equals("true")).collect(Collectors.toList());
     }
 
-    //根据id查询用户
+    /**
+     * //根据id查询用户
+     * @param ids
+     * @return
+     */
     @Override
     public List<MailUser> mailUserSelectById(List<Integer> ids) {
         if (ids != null) {
@@ -211,7 +241,11 @@ public class MailUserServiceImpl implements MailUserService {
         }
     }
 
-    //模糊查询
+    /**
+     *  //模糊查询
+     * @param email
+     * @return
+     */
     @Override
     public List<MailUser> mailUserDimSelect(String email) {
         if (email == null || email.replaceAll(" +", "").equals("")) {
@@ -225,7 +259,11 @@ public class MailUserServiceImpl implements MailUserService {
     }
 
 
-    //根据角色查询该角色下的所有用户
+    /**
+     * //根据角色查询该角色下的所有用户
+     * @param role_id
+     * @return
+     */
     @Override
     public List<MailUser> mailUserSelectByRole(Integer role_id) {
         if (role_id == null) {
@@ -238,7 +276,11 @@ public class MailUserServiceImpl implements MailUserService {
         }
     }
 
-    //根据用户姓名查询用户
+    /**
+     * //根据用户姓名查询用户
+     * @param name
+     * @return
+     */
     @Override
     public MailUser queryUserByName(String name) {
         if (name == null || name.replaceAll(" +", "").equals("")) {
