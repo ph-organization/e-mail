@@ -121,9 +121,9 @@ public class MailUserServiceImpl implements MailUserService {
                 //判断用户邮箱用户是否失效以及用户名字是否存在
                 if (user != null && LogicCRUDUtil.succeed(user.getLose_user()) && queryUserByName(mailUser.getName()) == null) {
                     //设置修改时间
-                    user.setUpdate_time(TimesUtil.getCurrentDate());
+                    mailUser.setUpdate_time(TimesUtil.getCurrentDate());
                     //AES加密对象修改
-                    MailUser AES_user = AESUtil.encryptUser(user);
+                    MailUser AES_user = AESUtil.encryptUser(mailUser);
                     mailUserMapper.mailUserUpdate(AES_user);
                 } else {
                     log.info(mailUser.getEmail() + "用户邮箱和已失效或不存在，无法修改");
