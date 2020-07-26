@@ -24,7 +24,6 @@ import java.util.concurrent.TimeUnit;
  */
 @Service
 @Slf4j
-@Transactional
 public class MessageServiceImpl implements MessageService {
     @Autowired
     private RedisTemplate<String, Object> template;

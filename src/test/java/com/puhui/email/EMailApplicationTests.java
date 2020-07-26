@@ -97,14 +97,15 @@ public class EMailApplicationTests {
     //加密解密
     @Test
     public void AEStest(){
-        MailUser user = new MailUser("邹玉玺", "男", "1996-07-06", "1003941268@qq.com", "15680680103", "123456", "成都");
-        MailUser encryptedUser = AESUtil.encryptUser(user);
-        MailUser encryptedUser1 = AESUtil.encryptUser(user);
-        System.out.println("加密后的对象是"+user);
-        System.out.println("加密后的对象是2"+user);
-        MailUser deUser = AESUtil.decryptUser(encryptedUser);
-        System.out.println("解密后的对象是"+deUser);
-        System.out.println(AESUtil.decrypt("/24/Aeg+9+Luk0o5P+Cukg=="));
+        String encrypt = AESUtil.encrypt("15183270890");
+        String decrypt = AESUtil.decrypt("1CB9D9CFABBD4695702CAEF87BCB3DB1");
+        if ("15183270890".equals(decrypt)){
+            System.out.println("对了");
+        }else {
+            System.out.println("错了");
+            System.out.println(decrypt);
+        }
+
     }
 
 @Test

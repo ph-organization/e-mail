@@ -95,7 +95,7 @@ public class SaticScheduleTask {
 
         if (users!=null) {
             //将已过期用户取出来放入List集合中
-            List<MailUser> list = users.stream().filter(str -> str.getLose_user().equals("false")).collect(Collectors.toList());
+            List<MailUser> list = users.stream().filter(str -> "false".equals(str.getLose_user())).collect(Collectors.toList());
             //如果List不为空
             if (list!= null) {
                 //2 根据已过期用户email清理邮件记录

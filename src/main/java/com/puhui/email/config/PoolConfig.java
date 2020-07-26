@@ -10,6 +10,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 /**
  * @author: 邹玉玺
  * @date: 2020/7/15-8:57
+ * 并发任务的线程池
  */
 @Configuration
 public class PoolConfig {//extends AsyncConfigurerSupport {

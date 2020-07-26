@@ -55,7 +55,7 @@ public class MailRecordServiceImpl implements MailRecordService {
     //根据邮箱删除邮件记录（邮件记录没有做逻辑删除）
     @Override
     public void mailRecordDelete(String email) {
-        if (email == null || email.replaceAll(" +", "").equals("")) {
+        if (email == null || "".equals(email.replaceAll(" +", ""))) {
             log.info("没有该用户邮件记录。");
         } else {
             //删除之前先放到redis缓存,7天
@@ -92,7 +92,7 @@ public class MailRecordServiceImpl implements MailRecordService {
     @Override
     public List<MailRecord> mailRecordSelect(String email) {
         List<MailRecord> mailRecordList = null;
-        if (email == null || email.replaceAll(" +", "").equals("")) {
+        if (email == null || "".equals(email.replaceAll(" +", ""))) {
             log.info("请输入有效值");
             return null;
         } else {

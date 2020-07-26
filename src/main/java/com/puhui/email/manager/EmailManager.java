@@ -1,6 +1,7 @@
-package com.puhui.email.util;
+package com.puhui.email.manager;
 
 import com.puhui.email.entity.MailRecord;
+import com.puhui.email.util.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,21 +11,23 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.File;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author: 邹玉玺
- * @date: 2020/7/15-19:07
+ * @date: 2020/7/24-17:06
  */
 @Slf4j
 @Component
-public class EmailUtil {
+public class EmailManager {
+
     /**
      * 发送普通邮件
      *
@@ -122,10 +125,15 @@ public class EmailUtil {
     /**
      * 发送模板邮件
      */
-    public MailRecord sendTemplateMail(MailRecord mailRecord) throws Exception {
+    public MailRecord sendTemplateMail(MailRecord mailRecord) throws MessagingException {
         //获取角色名（只有根据角色发送才不为空）
-        String role = getRole();
-        log.info("发送邮件工具类中获取到的角色是" + role);
+        String role = null;
+        try {
+            role = getRole();
+        } catch (Exception e) {
+            log.error("不是根据角色发送，没有角色信息");
+        }
+
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
         helper.setFrom(sender);
@@ -138,13 +146,17 @@ public class EmailUtil {
         context.setVariable("content", mailRecord.getContent());
         String content = null;
         if (role != null) {
+            log.info("发送邮件工具类中获取到的角色是" + role);
             log.info("该发送方式是发送给" + role + "下所有用户");
-            if (role.equals("admin") || role.equals("superAdmin")) {
+            String str1="admin";
+            String str2="superAdmin";
+            if (str1.equals(role) || str2.equals(role)) {
                 content = this.templateEngine.process("mail/AdminTemplate", context);
             } else {
                 content = this.templateEngine.process("mail/UserTemplate", context);
             }
         } else {
+       log.info("不根据角色发送邮件"+mailRecord.getTarget());
             content = this.templateEngine.process("mail/UserTemplate", context);
         }
         helper.setText(content, true);
@@ -212,12 +224,15 @@ public class EmailUtil {
     public String getRole() {
         ListOperations options = redisTemplate.opsForList();
         String role = null;
-        while (true) {
-            role = (String) options.rightPop("role");
+        int x=0;
+        while (x<5) {
+            role = (String) options.rightPop("role",3, TimeUnit.SECONDS);
             if (role != null) {
                 break;
             }
+            x++;
         }
         return role;
     }
+
 }
