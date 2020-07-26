@@ -46,7 +46,7 @@ public class MailRecordController {
         mailRecordService.deleteMailRecordById(id);
     }
 
-    //根据当前登录的邮箱查询邮件记录
+    //根据当前登录的邮箱查询邮件发送记录
     @ApiOperation(value = "邮件记录表")
     @GetMapping (value = "/mail/mailRecordInsert")
     public List<MailRecord> mailRecordInsert() {

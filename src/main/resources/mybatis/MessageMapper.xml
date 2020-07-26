@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace mapper接口 必填 随便填值 防止SQL语句ID重名-->
+<mapper namespace="com.puhui.email.mapper.MessageMapper">
+    <!--    //添加短信-->
+    <insert id="saveMessage" parameterType="com.puhui.email.entity.Message">
+        INSERT INTO mail_message(sender,target,content,sendtime,targetphone)
+                VALUES(#{sender},#{target},#{content},#{sendtime},#{targetphone})
+    </insert>
+
+    <select id="listMessage" parameterType="string" resultType="com.puhui.email.entity.Message">
+        select * from mail_message where sender=#{sender}
+    </select>
+
+    <delete id="deleteMessage" parameterType="string">
+        delete from mail_message where sender=#{sender}
+    </delete>
+
+    <delete id="deleteById" parameterType="integer">
+        delete from mail_message where id=#{id}
+    </delete>
+
+</mapper>

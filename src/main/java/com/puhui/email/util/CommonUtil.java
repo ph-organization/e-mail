@@ -6,7 +6,9 @@ import java.util.Random;
 import java.util.UUID;
 
 public class CommonUtil {
-    private static final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");//设置日期格式
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");//设置日期格式
+
+
 
     /**
      * 以UUID重命名
@@ -75,7 +77,7 @@ public class CommonUtil {
     }
 
     public static String getTimeUtil() {
-        String date = df.format(System.currentTimeMillis());// new Date()为获取当前系统时间，也可使用当前时间戳
+        String date = DATE_FORMAT.format(System.currentTimeMillis());// new Date()为获取当前系统时间，也可使用当前时间戳
         return date;
     }
 

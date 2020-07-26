@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+
+<body>
+
+<div>模板邮件发送</div>
+<div>邮件信息是：
+    <table border="1">
+        <tr>
+            <td>邮件主题</td>
+            <td th:text="${topic}"></td>
+        </tr>
+        <tr>
+            <td>邮件内容</td>
+            <td th:text="${content}"></td>
+        </tr>
+        <tr>
+            <td>发送人：</td>
+            <td th:text="${sender}"></td>
+        </tr>
+        <a class="s"><img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1595389314371&di=3333b897244726fba766bc4533882b2c&imgtype=0&src=http%3A%2F%2Fbpic.588ku.com%2Felement_origin_min_pic%2F00%2F85%2F19%2F5556e88af163dd7.jpg"></a>
+    </table>
+</div>
+<div>
+    <a href="http://www.baidu.com">如有任何不懂的问题，点击查询：</a>
+</div>
+
+</body>
+
+</html>

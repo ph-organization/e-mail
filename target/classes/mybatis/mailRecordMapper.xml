@@ -7,7 +7,7 @@
 
 
    <insert id="insertMailRecord" parameterType="com.puhui.email.entity.MailRecord" >
-       insert into mail_record (topic,content,result,sendtime,email,filepath) values (#{topic},#{content},#{result},#{sendtime},#{email},#{filepath})
+       insert into mail_record (topic,content,result,sendtime,email,filepath,target) values (#{topic},#{content},#{result},#{sendtime},#{email},#{filepath},#{target})
    </insert>
     <!--根据邮箱删除记录-->
     <delete id="mailRecordDelete" parameterType="string">

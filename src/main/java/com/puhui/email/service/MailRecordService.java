@@ -10,12 +10,13 @@ import java.util.List;
  * @date: 2020/7/15
  */
 public interface MailRecordService {
+
     void insertMailRecord(MailRecord mailRecord);
 
     //根据邮箱删除邮件记录
     void mailRecordDelete(String email);
 
-    //根据邮箱和主题删除指定主题的邮件记录
+    //根据id删除指定邮件记录
     void deleteMailRecordById(Integer id);
     //根据邮箱查询邮件记录
     List<MailRecord> mailRecordSelect(String email);

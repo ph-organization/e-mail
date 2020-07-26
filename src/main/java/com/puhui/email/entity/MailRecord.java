@@ -23,7 +23,7 @@ public class MailRecord {
     @ApiParam("id")
     private Integer id;
 
-    @ApiParam("邮箱")
+    @ApiParam("发件人邮箱")
     private String email;
     //发送结果
     @ApiParam("发送邮件是否成功")
@@ -40,6 +40,9 @@ public class MailRecord {
 
     @ApiParam ("附件地址")
     private String filepath;
+
+    @ApiParam ("目标邮箱")
+    private String target;
 
     public MailRecord( Integer id) {
         this.id=id;
