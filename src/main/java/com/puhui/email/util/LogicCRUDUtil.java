@@ -14,10 +14,11 @@ import java.util.List;
 @Slf4j
 public class LogicCRUDUtil {
 
-    //有效账户
+    /**有效账户*/
     static final String SUCCEED = "true";
 
-    //添加有效用户
+
+    /**添加有效账户*/
     public static MailUser addSucceedUser(MailUser mailUser) {
         //true为有效用户(创建账户时默认为true)
         mailUser.setLose_user(SUCCEED);
@@ -27,7 +28,7 @@ public class LogicCRUDUtil {
         return mailUser;
     }
 
-    //判断用户是否有效（返回有效用户）
+    /**判断用户是否有效（返回有效用户）*/
     public static Boolean succeed(String lose_user) {
         if (SUCCEED.equals(lose_user)) {
             return true;
@@ -36,7 +37,8 @@ public class LogicCRUDUtil {
         }
     }
 
-    //判断用户是否有效（返回失效用户）
+
+    /**判断用户是否有效（返回失效用户）*/
     public static Boolean failed(String lose_user) {
         if (!SUCCEED.equals(lose_user)) {
             return true;
@@ -45,7 +47,7 @@ public class LogicCRUDUtil {
         }
     }
 
-    //返回有效用户
+    /**返回有效用户*/
     public static MailUser getSucceedUser(MailUser mailUser) {
         if (mailUser.getLose_user().equals(SUCCEED)) {
             return mailUser;
@@ -54,7 +56,7 @@ public class LogicCRUDUtil {
         }
     }
 
-    //返回有效用户集合
+    /**返回有效用户集合*/
     public static List<MailUser> getSucceedUserS(List<MailUser> mailUser) {
         List<MailUser> mailUserList = new ArrayList<>();
         for (MailUser mus : mailUser) {

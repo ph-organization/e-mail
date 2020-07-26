@@ -11,10 +11,6 @@ import java.io.*;
  * @date: 2020/7/23-9:08
  */
 @Slf4j
-/**
- * 将文件资源保存在D:\\upload下   (一般保存在服务器上)
- * 返回文件路径
- */
 public class FileUtil {
 
     public static String fileUpload( MultipartFile multipartFile) {

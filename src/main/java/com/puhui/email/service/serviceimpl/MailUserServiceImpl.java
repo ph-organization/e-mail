@@ -1,21 +1,18 @@
-package com.puhui.email.service.serviceImpl;
+package com.puhui.email.service.serviceimpl;
 
 import com.puhui.email.entity.MailUser;
-import com.puhui.email.entity.MailUserList;
 import com.puhui.email.entity.Relation;
 import com.puhui.email.mapper.MailUserMapper;
 import com.puhui.email.service.MailUserService;
 import com.puhui.email.service.RelationService;
 import com.puhui.email.service.RoleService;
-import com.puhui.email.util.AESUtil;
+import com.puhui.email.util.AesUtil;
 import com.puhui.email.util.LogicCRUDUtil;
 import com.puhui.email.util.TimesUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,7 +45,7 @@ public class MailUserServiceImpl implements MailUserService {
                         //设置有效账号及账号创建时间
                         MailUser User = LogicCRUDUtil.addSucceedUser(mailUser);
                         //AES加密对象保存
-                        MailUser AESUser = AESUtil.encryptUser(User);
+                        MailUser AESUser = AesUtil.encryptUser(User);
                         mailUserMapper.mailUserInsert(AESUser);
                         //拿到添加用户的id
                         int mailUserId = mailUserSelect(mailUser.getEmail()).getId();
@@ -111,7 +108,7 @@ public class MailUserServiceImpl implements MailUserService {
                     //设置修改时间
                     mailUser.setUpdate_time(TimesUtil.getCurrentDate());
                     //AES加密对象修改
-                    MailUser AES_user = AESUtil.encryptUser(mailUser);
+                    MailUser AES_user = AesUtil.encryptUser(mailUser);
                     mailUserMapper.mailUserUpdate(AES_user);
                 } else {
                     log.info(mailUser.getEmail() + "用户邮箱和已失效或不存在，无法修改");
@@ -135,7 +132,7 @@ public class MailUserServiceImpl implements MailUserService {
                 if (mu != null && LogicCRUDUtil.failed(mu.getLose_user()) && queryUserByName(mailUser.getName()) == null) {
                     MailUser User = LogicCRUDUtil.addSucceedUser(mailUser);
                     //AES加密对象保存
-                    MailUser AESUser = AESUtil.encryptUser(User);
+                    MailUser AESUser = AesUtil.encryptUser(User);
                     //重启逻辑删除的用户
                     mailUserMapper.mailUserRestart(AESUser);
                     log.info("重启成功");

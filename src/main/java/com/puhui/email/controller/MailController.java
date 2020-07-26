@@ -9,7 +9,7 @@ import com.puhui.email.service.MailService;
 import com.puhui.email.service.MailUserService;
 import com.puhui.email.service.MessageService;
 import com.puhui.email.service.RoleService;
-import com.puhui.email.util.AESUtil;
+import com.puhui.email.util.AesUtil;
 import com.puhui.email.util.BaseResult;
 import com.puhui.email.util.FileUtil;
 import io.swagger.annotations.Api;
@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -78,28 +77,22 @@ public class MailController {
         MailUser user = mailUserService.queryUserByName(target);
         String filePath = null;
         if (user != null) {
-
             //封装短信信息
             Message message = new Message();
             //收件人电话号码(需要解密)
-            message.setTargetphone(AESUtil.decrypt(user.getPhone()));
+            message.setTargetphone(AesUtil.decrypt(user.getPhone()));
             //收件人姓名
             message.setTarget(target);
             //邮件内容
             message.setContent(content);
             //新建一个邮件对象
             MailRecord mailRecord = new MailRecord();
-
-
             //获取  redis数据库 中对用户名缓存的标识码
             String redisNameCode = redisTemplates.opsForValue().get(user.getName());
-
             //获取 redis数据库  中对邮箱号缓存的标识码
             String redisEmailCode = redisTemplates.opsForValue().get(user.getEmail());
-
             //获取  redis数据库 中对电话号码缓存的标识码
-            String phoneCode = redisTemplates.opsForValue().get(AESUtil.decrypt(user.getPhone()));
-
+            String phoneCode = redisTemplates.opsForValue().get(AesUtil.decrypt(user.getPhone()));
             //判断该用户名30分钟之内是否已经提交过操作
             if (redisNameCode != null) {
                 if (sendMessage) {
@@ -143,8 +136,6 @@ public class MailController {
                 //附件路径
                 mailRecord.setFilepath(filePath);
             }
-
-
             if (sendMessage) {
                 if (phoneCode != null) {
                     //邮件能发送，短信不能发送
@@ -160,7 +151,6 @@ public class MailController {
                 result.setMessage("已提交邮件发送请求和短信发送请求");
                 return result;
             }
-
             mailService.sendSimpleMail(user, mailRecord, sendTemplateMail);
             result.setSuccess(true);
             result.setMessage("已提交邮件发送");

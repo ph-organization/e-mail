@@ -6,26 +6,49 @@ import java.util.List;
 
 /**
  * @description:
- * @author: 杨利华
+ * @author: 邹玉玺
  * @date: 2020/7/15
  */
 public interface MailRecordService {
-
+    /**
+     *
+     * @param mailRecord  邮件记录实体
+     */
     void insertMailRecord(MailRecord mailRecord);
 
-    //根据邮箱删除邮件记录
+    /**
+     *
+     * @param email  邮件账号（是当前登录用户的email）
+     */
     void mailRecordDelete(String email);
 
-    //根据id删除指定邮件记录
+
+    /**
+     *
+     * @param id  邮件记录的id
+     */
     void deleteMailRecordById(Integer id);
-    //根据邮箱查询邮件记录
+
+    /**
+     *
+     * @param email 邮件账号（是当前登录用户的email）
+     * @return
+     */
     List<MailRecord> mailRecordSelect(String email);
 
 
-    //根据邮箱查询7天内已删除的邮件记录
+    /**
+     *
+     * @param email
+     * @return
+     */
     List<MailRecord> maillRecycleBin(String email);
 
-    //查看垃圾箱里的邮件
+    /**
+     *
+     * @param email
+     * @return
+     */
     List<MailRecord> mailRubbish(String email);
 
 

@@ -1,4 +1,4 @@
-package com.puhui.email.service.serviceImpl;
+package com.puhui.email.service.serviceimpl;
 
 import com.puhui.email.entity.MailRecord;
 import com.puhui.email.entity.MailUser;

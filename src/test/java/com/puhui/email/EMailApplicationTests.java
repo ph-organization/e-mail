@@ -6,8 +6,7 @@ import com.puhui.email.entity.Role;
 import com.puhui.email.mapper.MailUserMapper;
 import com.puhui.email.service.MailUserService;
 import com.puhui.email.service.RoleService;
-import com.puhui.email.util.AESUtil;
-import com.puhui.email.util.TimesUtil;
+import com.puhui.email.util.AesUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
 
 @SpringBootTest
@@ -97,8 +95,8 @@ public class EMailApplicationTests {
     //加密解密
     @Test
     public void AEStest(){
-        String encrypt = AESUtil.encrypt("15183270890");
-        String decrypt = AESUtil.decrypt("1CB9D9CFABBD4695702CAEF87BCB3DB1");
+        String encrypt = AesUtil.encrypt("15183270890");
+        String decrypt = AesUtil.decrypt("1CB9D9CFABBD4695702CAEF87BCB3DB1");
         if ("15183270890".equals(decrypt)){
             System.out.println("对了");
         }else {
@@ -117,7 +115,7 @@ public class EMailApplicationTests {
 }
     @Test
     public void redisTest2(){
-        System.out.println("j解密："+AESUtil.decrypt("53E79812A1D7AE227F6845C049136526"));
+        System.out.println("j解密："+ AesUtil.decrypt("53E79812A1D7AE227F6845C049136526"));
 }
 
 

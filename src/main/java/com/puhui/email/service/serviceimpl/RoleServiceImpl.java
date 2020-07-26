@@ -1,16 +1,14 @@
-package com.puhui.email.service.serviceImpl;
+package com.puhui.email.service.serviceimpl;
 
 import com.puhui.email.entity.MailUser;
 import com.puhui.email.entity.Role;
 import com.puhui.email.mapper.RoleMapper;
 import com.puhui.email.service.MailUserService;
 import com.puhui.email.service.RoleService;
-import com.puhui.email.util.LogicCRUDUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 

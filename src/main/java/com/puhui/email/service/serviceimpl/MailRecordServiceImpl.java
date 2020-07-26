@@ -1,4 +1,4 @@
-package com.puhui.email.service.serviceImpl;
+package com.puhui.email.service.serviceimpl;
 
 import com.puhui.email.entity.MailRecord;
 import com.puhui.email.entity.MailUser;
@@ -37,19 +37,8 @@ public class MailRecordServiceImpl implements MailRecordService {
 
     @Override
     public void insertMailRecord(MailRecord mailRecord) {
-//        MailUser mailUser = mailUserService.mailUserSelect(mailRecord.getEmail());
-//        //判断用户邮箱是否有效
-//        if (mailUser != null && LogicCRUDUtil.succeed(mailUser.getLose_user())) {
-//            //判断邮箱，内容，主题是否为空
-//            if (mailRecord.getEmail() == null || mailRecord.getEmail().replaceAll(" +", "").equals("") || mailRecord.getContent() == null || mailRecord.getContent().replaceAll(" +", "").equals("") || mailRecord.getTopic() == null || mailRecord.getTopic().replaceAll(" +", "").equals("")) {
-//                log.info("没有填入 邮箱 或 内容 或 主题");
-//            } else {
                 //添加记录
                 mailRecordMapper.insertMailRecord(mailRecord);
-//            }
-//        } else {
-//            log.info(mailRecord.getEmail() + "用户已失效或不存在，无法添加记录");
-//        }
     }
 
     //根据邮箱删除邮件记录（邮件记录没有做逻辑删除）

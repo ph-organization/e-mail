@@ -16,8 +16,8 @@ import java.security.SecureRandom;
  *
  * @author Frank
  */
-public class AESUtil {
-    private static Logger logger = LoggerFactory.getLogger(AESUtil.class);
+public class AesUtil {
+    private static Logger logger = LoggerFactory.getLogger(AesUtil.class);
     private static final String KEY_ALGORITHM = "AES";
     private static final String CHARSET_NAME = "utf-8";//编码
     private static final String PASSWORD = "123.";//默认的密码
@@ -45,7 +45,7 @@ public class AESUtil {
                 e.printStackTrace();
             }
             byte[] result = cipher.doFinal(byteContent);// 加密
-            return AESUtil.parseByte2HexStr(result);
+            return AesUtil.parseByte2HexStr(result);
         } catch (Exception e) {
             logger.error("AES字符串加密出现异常");
         }
@@ -60,7 +60,7 @@ public class AESUtil {
      */
     public static String decrypt(String strResult) {
         try {
-            byte[] content = AESUtil.parseHexStr2Byte(strResult);
+            byte[] content = AesUtil.parseHexStr2Byte(strResult);
             KeyGenerator kgen = KeyGenerator.getInstance(KEY_ALGORITHM);// 创建AES的Key生产者
             kgen.init(128, new SecureRandom(PASSWORD.getBytes()));
             SecretKey secretKey = kgen.generateKey();// 根据用户密码，生成一个密钥

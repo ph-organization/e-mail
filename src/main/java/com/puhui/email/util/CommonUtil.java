@@ -4,7 +4,10 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Random;
 import java.util.UUID;
-
+/**
+ * @author: 邹玉玺
+ * @date: 2020/7/5-15:54
+ */
 public class CommonUtil {
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");//设置日期格式
 

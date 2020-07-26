@@ -225,7 +225,8 @@ public class EmailManager {
         ListOperations options = redisTemplate.opsForList();
         String role = null;
         int x=0;
-        while (x<5) {
+        int y=5;
+        while (x<y) {
             role = (String) options.rightPop("role",3, TimeUnit.SECONDS);
             if (role != null) {
                 break;
