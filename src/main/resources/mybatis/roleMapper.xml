@@ -25,6 +25,10 @@
     <select id="mailUserSelectByRoleName" parameterType="string" resultType="com.puhui.email.entity.MailUser">
         SELECT mu.* FROM t_role ro,mail_user mu,role_rolegroup rrg,mailuser_rolegroup mrg,role_group rg WHERE ro.id=rrg.role_id and rrg.role_group_id=rg.id and rg.id=mrg.role_group_id and mrg.mailuser_id=mu.id  and ro.role_note=#{role_note}
     </select>
+    <!--根据角色id查询角色下的所有邮件用户（通过角色组查询）-->
+    <select id="mailUserSelectByRoleId" parameterType="integer" resultType="com.puhui.email.entity.MailUser">
+        SELECT mu.* FROM t_role ro,mail_user mu,role_rolegroup rrg,mailuser_rolegroup mrg,role_group rg WHERE ro.id=rrg.role_id and rrg.role_group_id=rg.id and rg.id=mrg.role_group_id and mrg.mailuser_id=mu.id  and ro.id=#{id}
+    </select>
     <!--根据角色组组名查询（通过用户组查询）主要拿到id-->
     <select id="roleGroupSelectByRoleGroupName" parameterType="string" resultType="com.puhui.email.entity.RoleGroup">
         SELECT * FROM role_group WHERE group_name=#{group_name}

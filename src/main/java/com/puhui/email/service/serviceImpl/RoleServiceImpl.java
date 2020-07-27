@@ -153,7 +153,26 @@ public class RoleServiceImpl implements RoleService {
             log.info("请输入有效值");
             return null;
         } else {
-            return roleMapper.mailUserSelectByRoleName(roleName);
+            List<MailUser> mailUserList = roleMapper.mailUserSelectByRoleName(roleName);
+            //返回有效用户
+            return mailUserList.stream().filter(mailUser -> "true".equals(mailUser.getLose_user())).collect(Collectors.toList());
+        }
+    }
+
+    /**
+     * 根据角色id查询角色下的所有邮件用户（通过角色组查询）
+     * @param roleId
+     * @return
+     */
+    @Override
+    public List<MailUser> mailUserSelectByRoleId(Integer roleId){
+        if (roleId == null) {
+            log.info("请输入有效值");
+            return null;
+        } else {
+            List<MailUser> mailUserList = roleMapper.mailUserSelectByRoleId(roleId);
+            //返回有效用户
+            return mailUserList.stream().filter(mailUser -> "true".equals(mailUser.getLose_user())).collect(Collectors.toList());
         }
     }
 }

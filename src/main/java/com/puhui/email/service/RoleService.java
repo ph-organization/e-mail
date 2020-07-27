@@ -53,4 +53,11 @@ public interface RoleService {
      * @return
      */
     List<MailUser> mailUserSelectByRoleName (String roleName);
+
+    /**
+     * 根据角色id查询角色下的所有邮件用户（通过角色组查询）
+     * @param roleId
+     * @return
+     */
+    List<MailUser> mailUserSelectByRoleId (Integer roleId);
 }

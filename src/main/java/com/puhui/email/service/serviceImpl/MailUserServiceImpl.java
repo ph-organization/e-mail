@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -270,9 +271,18 @@ public class MailUserServiceImpl implements MailUserService {
             log.info("角色不存在");
             return null;
         } else {
-            List<MailUser> list = mailUserMapper.mailUserSelectByRole(role_id);
+            List<MailUser> allMailUser=new ArrayList<MailUser>();
+            //那到拥有该角色的所有用户
+            List<MailUser> mailUserList = mailUserMapper.mailUserSelectByRole(role_id);
+            //通过角色名拿到拥有该角色的所有用户（通过角色组）
+            List<MailUser> roleGroupMailUsers=roleService.mailUserSelectByRoleId(role_id);
+            //合并集合
+            allMailUser.addAll(mailUserList);
+            allMailUser.addAll(roleGroupMailUsers);
+            //去除重复的邮件用户
+            allMailUser=new ArrayList<MailUser>(new LinkedHashSet<>(allMailUser));
             //返回有效账户
-            return list.stream().filter(mailUser -> mailUser.getLose_user().equals("true")).collect(Collectors.toList());
+            return allMailUser.stream().filter(mailUser -> "true".equals(mailUser.getLose_user())).collect(Collectors.toList());
         }
     }
 
