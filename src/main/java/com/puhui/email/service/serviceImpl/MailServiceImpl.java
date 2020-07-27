@@ -76,10 +76,6 @@ public class MailServiceImpl implements MailService {
         mailRecord.setEmail(loginUserEmail);
         //邮件发送的目标用户
         mailRecord.setTarget(user.getEmail());
-        //邮件主题
-        mailRecord.setTopic(topic);
-        //设置邮件内容
-        mailRecord.setContent(content);
 
             try {
                 //发送邮件
@@ -158,7 +154,6 @@ public class MailServiceImpl implements MailService {
                 log.info("发送普通邮件");
                 mailRecord = emailManager.sendSimpleEmail(mailRecord);
             }
-
 
             //保存数据库
             mailRecord.setResult("success");

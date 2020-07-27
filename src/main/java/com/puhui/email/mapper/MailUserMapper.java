@@ -12,41 +12,75 @@ import java.util.List;
 
 public interface MailUserMapper {
 
-    //管理员 start
-    //添加用户
+    /**
+     * 邮件用户添加
+     * @param mailUser
+     */
     void mailUserInsert(MailUser mailUser);
 
-    //逻辑删除用户
+    /**
+     * //逻辑删除用户
+     * @param mailUser
+     */
     void mailUserLogicDelete(MailUser mailUser);
 
-    //逻辑删除多个用户
+    /**
+     * //逻辑删除多个用户
+     * @param ids
+     */
     void mailUserLogicDeleteS(List<Integer> ids);
 
-    //修改用户
+    /**
+     * //修改用户
+     * @param mailUser
+     */
     void mailUserUpdate(MailUser mailUser);
 
-    //添加逻辑删除后的用户(重启逻辑删除后的用户)
+    /**
+     *     //添加逻辑删除后的用户(重启逻辑删除后的用户)
+     * @param mailUser
+     */
     void mailUserRestart(MailUser mailUser);
 
-    //根据邮箱查询用户
+    /**
+     * //根据邮箱查询用户
+     * @param email
+     * @return
+     */
     MailUser mailUserSelect(String email);
 
-    //根据邮箱模糊查询用户
+    /**
+     * //根据邮箱模糊查询用户
+     * @param email
+     * @return
+     */
     List<MailUser> mailUserDimSelect(String email);
 
-    //根据id查询用户
+    /**
+     * //根据id查询用户
+     * @param ids
+     * @return
+     */
     List<MailUser> mailUserSelectById(List<Integer> ids);
 
-    //根据角色查询该角色下的所有用户
+    /**
+     *     //根据角色查询该角色下的所有用户
+      * @param role_id
+     * @return
+     */
     List<MailUser> mailUserSelectByRole(Integer role_id);
 
-    //    List<MailUser> mailUserSelects(List<String> email);
-    //查询全部
+    /**
+     * //查询全部
+      * @return
+     */
     List<MailUser> mailUserSelectAll();
 
-    //根据用户姓名查询用户
+    /**
+     * //根据用户姓名查询用户
+     * @param name
+     * @return
+     */
     MailUser queryUserByName(String name);
-
-// 管理员 end
 
 }

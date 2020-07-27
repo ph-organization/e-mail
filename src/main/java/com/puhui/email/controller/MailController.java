@@ -89,7 +89,8 @@ public class MailController {
             message.setContent(content);
             //新建一个邮件对象
             MailRecord mailRecord = new MailRecord();
-
+            mailRecord.setTopic(topic);
+            mailRecord.setContent(content);
 
             //获取  redis数据库 中对用户名缓存的标识码
             String redisNameCode = redisTemplates.opsForValue().get(user.getName());

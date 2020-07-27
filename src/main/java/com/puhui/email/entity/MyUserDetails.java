@@ -62,7 +62,7 @@ public class MyUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        if ("true".equals(lose_user)) {
+        if (lose_user.equals("true")) {
             return true;
         } else {
             return false;

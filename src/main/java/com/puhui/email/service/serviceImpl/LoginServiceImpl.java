@@ -2,8 +2,10 @@ package com.puhui.email.service.serviceImpl;
 
 import com.puhui.email.entity.MailUser;
 import com.puhui.email.entity.MyUserDetails;
+import com.puhui.email.entity.Role;
 import com.puhui.email.mapper.LoginMapper;
 import com.puhui.email.service.LoginService;
+import com.puhui.email.service.RoleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -12,6 +14,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
 
 /**
  * @description:
@@ -30,6 +35,8 @@ public class LoginServiceImpl implements LoginService {
     LoginMapper loginMapper;
     @Resource
     MyUserDetails myUserDetails;
+    @Resource
+    RoleService roleService;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -41,7 +48,17 @@ public class LoginServiceImpl implements LoginService {
         if(myUserDetails==null){
             throw new UsernameNotFoundException("账户不存在");
         }else {
-            myUserDetails.setRoles(loginMapper.getUserRole(myUserDetails.getId()));
+            List<Role> allRole=new ArrayList<Role>();
+            //通过角色组查询到的角色集
+            List<Role> roleList = roleService.roleSelectByEmail(email);
+            //通过邮件用户与角色查询到的角色集
+            List<Role> userRole = loginMapper.getUserRole(myUserDetails.getId());
+            //合并角色集
+            allRole.addAll(roleList);
+            allRole.addAll(userRole);
+            //去除重复的角色
+            allRole=new ArrayList<Role>(new LinkedHashSet<>(allRole));
+            myUserDetails.setRoles(allRole);
             log.info("detalis"+myUserDetails);
         }
         //将用户存入缓存
