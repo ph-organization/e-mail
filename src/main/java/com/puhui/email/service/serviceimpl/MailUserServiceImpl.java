@@ -1,18 +1,22 @@
-package com.puhui.email.service.serviceimpl;
+package com.puhui.email.service.serviceImpl;
 
 import com.puhui.email.entity.MailUser;
+import com.puhui.email.entity.MailUserList;
 import com.puhui.email.entity.Relation;
 import com.puhui.email.mapper.MailUserMapper;
 import com.puhui.email.service.MailUserService;
 import com.puhui.email.service.RelationService;
 import com.puhui.email.service.RoleService;
-import com.puhui.email.util.AesUtil;
+import com.puhui.email.util.AESUtil;
 import com.puhui.email.util.LogicCRUDUtil;
 import com.puhui.email.util.TimesUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,11 +36,14 @@ public class MailUserServiceImpl implements MailUserService {
     @Resource
     RoleService roleService;
 
-    //添加单个用户
+    /**
+     * //添加单个用户
+     * @param mailUser
+     */
     @Override
     public void mailUserInsert(MailUser mailUser) {
         if (mailUser.getName() != null && mailUser.getEmail() != null && mailUser.getBirthday() != null && mailUser.getAddress() != null && mailUser.getPhone() != null && mailUser.getSex() != null && mailUser.getPwd() != null) {
-            if ("".equals(mailUser.getName().replaceAll(" +", "")) || "".equals(mailUser.getEmail().replaceAll(" +", "")) || "".equals(mailUser.getBirthday().replaceAll(" +", "")) || "".equals(mailUser.getAddress().replaceAll(" +", "")) || "".equals(mailUser.getPhone().replaceAll(" +", "")) || "".equals(mailUser.getSex().replaceAll(" +", "")) || "".equals(mailUser.getPwd().replaceAll(" +", ""))) {
+            if (mailUser.getName().replaceAll(" +", "").equals("") || mailUser.getEmail().replaceAll(" +", "").equals("") || mailUser.getBirthday().replaceAll(" +", "").equals("") || mailUser.getAddress().replaceAll(" +", "").equals("") || mailUser.getPhone().replaceAll(" +", "").equals("") || mailUser.getSex().replaceAll(" +", "").equals("") || mailUser.getPwd().replaceAll(" +", "").equals("")) {
                 log.info("请输入有效值");
             } else {
                 //判断数据库中是否已有该用户(根据Email和姓名)
@@ -45,7 +52,7 @@ public class MailUserServiceImpl implements MailUserService {
                         //设置有效账号及账号创建时间
                         MailUser User = LogicCRUDUtil.addSucceedUser(mailUser);
                         //AES加密对象保存
-                        MailUser AESUser = AesUtil.encryptUser(User);
+                        MailUser AESUser = AESUtil.encryptUser(User);
                         mailUserMapper.mailUserInsert(AESUser);
                         //拿到添加用户的id
                         int mailUserId = mailUserSelect(mailUser.getEmail()).getId();
@@ -65,10 +72,13 @@ public class MailUserServiceImpl implements MailUserService {
         }
     }
 
-    //根据email逻辑删除的单个用户
+    /**
+     * //根据email逻辑删除的单个用户
+     * @param email
+     */
     @Override
     public void mailUserLogicDelete(String email) {
-        if (email == null || "".equals(email.replaceAll(" +", ""))) {
+        if (email == null || email.replaceAll(" +", "").equals("")) {
             log.info("请输入有效值。");
         } else {
             //查询出该邮箱用户
@@ -83,7 +93,10 @@ public class MailUserServiceImpl implements MailUserService {
         }
     }
 
-    //逻辑删除多个
+    /**
+     *  //逻辑删除多个
+     * @param ids
+     */
     @Override
     public void mailUserLogicDeleteS(List<Integer> ids) {
         if (ids != null) {
@@ -94,11 +107,14 @@ public class MailUserServiceImpl implements MailUserService {
     }
 
 
-    //根据email修改单个
+    /**
+     * //根据email修改单个
+     * @param mailUser
+     */
     @Override
     public void mailUserUpdate(MailUser mailUser) {
         if (mailUser.getName() != null && mailUser.getEmail() != null && mailUser.getBirthday() != null && mailUser.getAddress() != null && mailUser.getPhone() != null && mailUser.getSex() != null && mailUser.getPwd() != null) {
-            if ("".equals(mailUser.getName().replaceAll(" +", "")) || "".equals(mailUser.getEmail().replaceAll(" +", "")) || "".equals(mailUser.getBirthday().replaceAll(" +", "")) || "".equals(mailUser.getAddress().replaceAll(" +", "")) || "".equals(mailUser.getPhone().replaceAll(" +", "")) || "".equals(mailUser.getSex().replaceAll(" +", "")) || "".equals(mailUser.getPwd().replaceAll(" +", ""))) {
+            if (mailUser.getName().replaceAll(" +", "").equals("") || mailUser.getEmail().replaceAll(" +", "").equals("") || mailUser.getBirthday().replaceAll(" +", "").equals("") || mailUser.getAddress().replaceAll(" +", "").equals("") || mailUser.getPhone().replaceAll(" +", "").equals("") || mailUser.getSex().replaceAll(" +", "").equals("") || mailUser.getPwd().replaceAll(" +", "").equals("")) {
                 log.info("请输入有效值");
             } else {
                 //查询出该邮箱用户
@@ -108,7 +124,7 @@ public class MailUserServiceImpl implements MailUserService {
                     //设置修改时间
                     mailUser.setUpdate_time(TimesUtil.getCurrentDate());
                     //AES加密对象修改
-                    MailUser AES_user = AesUtil.encryptUser(mailUser);
+                    MailUser AES_user = AESUtil.encryptUser(mailUser);
                     mailUserMapper.mailUserUpdate(AES_user);
                 } else {
                     log.info(mailUser.getEmail() + "用户邮箱和已失效或不存在，无法修改");
@@ -119,11 +135,14 @@ public class MailUserServiceImpl implements MailUserService {
         }
     }
 
-    //添加逻辑删除后的用户(重启逻辑删除后的用户)
+    /**
+     * //添加逻辑删除后的用户(重启逻辑删除后的用户)
+     * @param mailUser
+     */
     @Override
     public void mailUserRestart(MailUser mailUser) {
         if (mailUser.getName() != null && mailUser.getEmail() != null && mailUser.getBirthday() != null && mailUser.getAddress() != null && mailUser.getPhone() != null && mailUser.getSex() != null && mailUser.getPwd() != null) {
-            if ("".equals(mailUser.getName().replaceAll(" +", "")) || "".equals(mailUser.getEmail().replaceAll(" +", "")) || "".equals(mailUser.getBirthday().replaceAll(" +", "")) || "".equals(mailUser.getAddress().replaceAll(" +", "")) || "".equals(mailUser.getPhone().replaceAll(" +", "")) || "".equals(mailUser.getSex().replaceAll(" +", "")) || "".equals(mailUser.getPwd().replaceAll(" +", ""))) {
+            if (mailUser.getName().replaceAll(" +", "").equals("") || mailUser.getEmail().replaceAll(" +", "").equals("") || mailUser.getBirthday().replaceAll(" +", "").equals("") || mailUser.getAddress().replaceAll(" +", "").equals("") || mailUser.getPhone().replaceAll(" +", "").equals("") || mailUser.getSex().replaceAll(" +", "").equals("") || mailUser.getPwd().replaceAll(" +", "").equals("")) {
                 log.info("请输入有效值");
             } else {
                 //查询用户
@@ -132,7 +151,7 @@ public class MailUserServiceImpl implements MailUserService {
                 if (mu != null && LogicCRUDUtil.failed(mu.getLose_user()) && queryUserByName(mailUser.getName()) == null) {
                     MailUser User = LogicCRUDUtil.addSucceedUser(mailUser);
                     //AES加密对象保存
-                    MailUser AESUser = AesUtil.encryptUser(User);
+                    MailUser AESUser = AESUtil.encryptUser(User);
                     //重启逻辑删除的用户
                     mailUserMapper.mailUserRestart(AESUser);
                     log.info("重启成功");
@@ -146,10 +165,14 @@ public class MailUserServiceImpl implements MailUserService {
     }
 
 
-    //根据email查询单个(返回有效用户)
+    /**
+     * //根据email查询单个(返回有效用户)
+     * @param email
+     * @return
+     */
     @Override
     public MailUser mailUserSelect(String email) {
-        if (email == null || "".equals(email.replaceAll(" +", ""))) {
+        if (email == null || email.replaceAll(" +", "").equals("")) {
             log.info("请输入有效值。");
             return null;
         } else {
@@ -165,10 +188,14 @@ public class MailUserServiceImpl implements MailUserService {
         }
     }
 
-    //根据email查询单个(返回失效用户)
+    /**
+     * //根据email查询单个(返回失效用户)
+     * @param email
+     * @return
+     */
     @Override
     public MailUser mailUserFailed(String email) {
-        if (email == null || "".equals(email.replaceAll(" +", ""))) {
+        if (email == null || email.replaceAll(" +", "").equals("")) {
             log.info("请输入有效值。");
             return null;
         } else {
@@ -185,60 +212,88 @@ public class MailUserServiceImpl implements MailUserService {
     }
 
 
-    //查询全部
+    /**
+     * //查询全部
+     * @return
+     */
     @Override
     public List<MailUser> mailUserSelectAll() {
         //拿到全部用户
         List<MailUser> list = mailUserMapper.mailUserSelectAll();
         //返回有效账户
-        return list.stream().filter(mailUser -> "true".equals(mailUser.getLose_user())).collect(Collectors.toList());
+        return list.stream().filter(mailUser -> mailUser.getLose_user().equals("true")).collect(Collectors.toList());
     }
 
-    //根据id查询用户
+    /**
+     * //根据id查询用户
+     * @param ids
+     * @return
+     */
     @Override
     public List<MailUser> mailUserSelectById(List<Integer> ids) {
         if (ids != null) {
             //拿到id下的所有用户
             List<MailUser> list = mailUserMapper.mailUserSelectById(ids);
             //返回有效账户
-            return list.stream().filter(mailUser -> "true".equals(mailUser.getLose_user())).collect(Collectors.toList());
+            return list.stream().filter(mailUser -> mailUser.getLose_user().equals("true")).collect(Collectors.toList());
         } else {
             log.info("请输入有效值");
             return null;
         }
     }
 
-    //模糊查询
+    /**
+     *  //模糊查询
+     * @param email
+     * @return
+     */
     @Override
     public List<MailUser> mailUserDimSelect(String email) {
-        if (email == null || "".equals(email.replaceAll(" +", ""))) {
+        if (email == null || email.replaceAll(" +", "").equals("")) {
             log.info("请输入有效值");
             return null;
         } else {
             List<MailUser> list = mailUserMapper.mailUserDimSelect(email);
             //返回有效账户
-            return list.stream().filter(mailUser -> "true".equals(mailUser.getLose_user())).collect(Collectors.toList());
+            return list.stream().filter(mailUser -> mailUser.getLose_user().equals("true")).collect(Collectors.toList());
         }
     }
 
 
-    //根据角色查询该角色下的所有用户
+    /**
+     * //根据角色查询该角色下的所有用户
+     * @param role_id
+     * @return
+     */
     @Override
     public List<MailUser> mailUserSelectByRole(Integer role_id) {
         if (role_id == null) {
             log.info("角色不存在");
             return null;
         } else {
-            List<MailUser> list = mailUserMapper.mailUserSelectByRole(role_id);
+            List<MailUser> allMailUser=new ArrayList<MailUser>();
+            //那到拥有该角色的所有用户
+            List<MailUser> mailUserList = mailUserMapper.mailUserSelectByRole(role_id);
+            //通过角色名拿到拥有该角色的所有用户（通过角色组）
+            List<MailUser> roleGroupMailUsers=roleService.mailUserSelectByRoleId(role_id);
+            //合并集合
+            allMailUser.addAll(mailUserList);
+            allMailUser.addAll(roleGroupMailUsers);
+            //去除重复的邮件用户
+            allMailUser=new ArrayList<MailUser>(new LinkedHashSet<>(allMailUser));
             //返回有效账户
-            return list.stream().filter(mailUser -> "true".equals(mailUser.getLose_user())).collect(Collectors.toList());
+            return allMailUser.stream().filter(mailUser -> "true".equals(mailUser.getLose_user())).collect(Collectors.toList());
         }
     }
 
-    //根据用户姓名查询用户
+    /**
+     * //根据用户姓名查询用户
+     * @param name
+     * @return
+     */
     @Override
     public MailUser queryUserByName(String name) {
-        if (name == null || "".equals(name.replaceAll(" +", ""))) {
+        if (name == null || name.replaceAll(" +", "").equals("")) {
             log.info("请输入有效值");
             return null;
         } else {

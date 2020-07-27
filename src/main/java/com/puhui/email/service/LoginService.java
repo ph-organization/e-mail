@@ -10,6 +10,12 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
  * @date: 2020/7/11
  */
 public interface LoginService extends UserDetailsService {
+    /**
+     * 加载登录用户信息
+     * @param username
+     * @return
+     * @throws UsernameNotFoundException
+     */
     @Override
     UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
 }

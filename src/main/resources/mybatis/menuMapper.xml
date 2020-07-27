@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace mapper接口 必填 随便填值 防止SQL语句ID重名-->
+<mapper namespace="com.puhui.email.mapper.MenuMapper">
+
+    <resultMap id="BaseResultMap" type="com.puhui.email.entity.Menu">
+        <id property="id" column="id"></id>
+        <result property="pattern" column="pattern"></result>
+        <collection property="roles" ofType="com.puhui.email.entity.Role">
+            <id property="id" column="id"></id>
+            <result property="role_name" column="role_name"></result>
+            <result property="role_note" column="role_note"></result>
+        </collection>
+    </resultMap>
+
+    <select id="getAllMenu" parameterType="list" resultMap="BaseResultMap">
+        SELECT m.*,r.* FROM menu m,menu_role mr,t_role r WHERE m.id=mr.mid AND mr.rid=r.id
+    </select>
+</mapper>

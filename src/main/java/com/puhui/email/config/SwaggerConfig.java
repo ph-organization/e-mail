@@ -26,14 +26,10 @@ public class SwaggerConfig {
     //配置swagger的docket的bean实例
     @Bean
     public Docket docket1(Environment environment) {
-//        //设置要显示的swagger环境
-//        Profiles profiles = Profiles.of("dev");
-//        //通过environment.acceptsProfiles判断是否处在自己设定的环境当中
-//        boolean flag = environment.acceptsProfiles(profiles);
 
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(ylhApiInfo())
-                .groupName("杨利华_用户crud")
+                .groupName("杨利华")
                 //enable(false) 关闭swagger 不能在浏览器中访问，默认是启动的（true）
                 .enable(true)
                 .select()
@@ -45,22 +41,9 @@ public class SwaggerConfig {
                 //withMethodAnnotation(GetMapping.class) 扫描方法上的注解
                 .apis(RequestHandlerSelectors.basePackage("com.puhui.email.controller"))
                 //paths() 过滤某某路径（让过滤的路径通过）
-                .paths(PathSelectors.ant("/mailUser/**"))
+                .paths(PathSelectors.any())
                 .build();
     }
-
-    @Bean
-    public Docket docket2(Environment environment) {
-        return new Docket(DocumentationType.SWAGGER_2)
-                .apiInfo(ylhApiInfo())
-                .groupName("杨利华_角色crud_角色与用户关系的添加和地删除")
-                .enable(true)
-                .select()
-                .apis(RequestHandlerSelectors.basePackage("com.puhui.email.controller"))
-                .paths(PathSelectors.ant("/role/**"))
-                .build();
-    }
-
     //配置swagger信息apiInfo
     public ApiInfo ylhApiInfo() {
         //作者信息
