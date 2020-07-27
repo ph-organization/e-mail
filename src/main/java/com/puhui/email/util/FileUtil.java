@@ -15,11 +15,16 @@ public class FileUtil {
 
     public static String fileUpload( MultipartFile multipartFile) {
         String filepath="D:\\upload\\"+multipartFile.getOriginalFilename();
+        File file = new File(filepath);
+        File parentFile = file.getParentFile();
         try {
+            //如果文件夹不存在  创建文件夹
+            if (!parentFile.exists()){
+                parentFile.mkdirs();
+            }
             //上传文件到指定位置
             BufferedOutputStream out = new BufferedOutputStream(
-                    new FileOutputStream(new File(
-                            filepath)));
+                    new FileOutputStream(file));
             System.out.println(multipartFile.getName());
             out.write(multipartFile.getBytes());
             out.flush();

@@ -47,10 +47,10 @@ public class MailServiceImpl implements MailService {
     @Autowired
     private EmailManager emailManager;
 
-    //获取内容
+    /**获取内容*/
     @Value ("${mail.send.content}")
     private String content;
-    //获取主题
+    /**获取主题*/
     @Value ("${mail.send.topic}")
     private String topic;
 
@@ -114,14 +114,15 @@ public class MailServiceImpl implements MailService {
 
 
                 //发送失败将邮件放入垃圾箱
-                if (template.opsForValue().get("email垃圾箱" + loginUserEmail) != null) {
-                    List<MailRecord> list = (List<MailRecord>) template.opsForValue().get("email垃圾箱" + loginUserEmail);
+                String key="email垃圾箱"+loginUserEmail;
+                if (template.opsForValue().get(key) != null) {
+                    List<MailRecord> list = (List<MailRecord>) template.opsForValue().get(key);
                     list.add(mailRecord);
-                    template.opsForValue().set("email垃圾箱" + loginUserEmail, list, 14, TimeUnit.DAYS);
+                    template.opsForValue().set(key, list, 14, TimeUnit.DAYS);
                 } else {
                     List<MailRecord> list = new ArrayList<>();
                     list.add(mailRecord);
-                    template.opsForValue().set("email垃圾箱" + loginUserEmail, list, 14, TimeUnit.DAYS);
+                    template.opsForValue().set(key, list, 14, TimeUnit.DAYS);
                 }
 
                 log.error("给"+user.getName()+"发送邮件失败，已放入垃圾箱");
@@ -168,14 +169,15 @@ public class MailServiceImpl implements MailService {
             mailRecord.setSendtime(sendtime);
             mailRecord.setResult("false");
             //发送失败，添加到垃圾箱
-            if (template.opsForValue().get("email垃圾箱" + loginUserEmail) != null) {
-                List<MailRecord> list = (List<MailRecord>) template.opsForValue().get("email垃圾箱" + loginUserEmail);
+            String key="email垃圾箱"+loginUserEmail;
+            if (template.opsForValue().get(key) != null) {
+                List<MailRecord> list = (List<MailRecord>) template.opsForValue().get(key);
                 list.add(mailRecord);
-                template.opsForValue().set("email垃圾箱" + loginUserEmail, list, 14, TimeUnit.DAYS);
+                template.opsForValue().set(key, list, 14, TimeUnit.DAYS);
             } else {
                 List<MailRecord> list = new ArrayList<>();
                 list.add(mailRecord);
-                template.opsForValue().set("email垃圾箱" + loginUserEmail, list, 14, TimeUnit.DAYS);
+                template.opsForValue().set(key, list, 14, TimeUnit.DAYS);
             }
             log.error("发送失败，存入垃圾箱");
         }
@@ -210,15 +212,15 @@ public class MailServiceImpl implements MailService {
             log.error("邮件接收人" + target + "主题" + topic + "内容" + content + "邮件发送出现异常");
             log.error("异常信息为" + e.getMessage());
             log.error("异常堆栈信息为-->");
-
-            if (template.opsForValue().get("email垃圾箱" + loginUserEmail) != null) {
-                List<MailRecord> list = (List<MailRecord>) template.opsForValue().get("垃圾箱" + loginUserEmail);
+            String key="email垃圾箱"+loginUserEmail;
+            if (template.opsForValue().get(key) != null) {
+                List<MailRecord> list = (List<MailRecord>) template.opsForValue().get(key);
                 list.add(mailRecord);
-                template.opsForValue().set("email垃圾箱" + loginUserEmail, list, 14, TimeUnit.DAYS);
+                template.opsForValue().set(key, list, 14, TimeUnit.DAYS);
             } else {
                 List<MailRecord> list = new ArrayList<>();
                 list.add(mailRecord);
-                template.opsForValue().set("email垃圾箱" + loginUserEmail, list, 14, TimeUnit.DAYS);
+                template.opsForValue().set(key, list, 14, TimeUnit.DAYS);
             }
             log.error("发送失败，存入垃圾箱");
         }
