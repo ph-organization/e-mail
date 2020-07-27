@@ -1,4 +1,4 @@
-package com.puhui.email.service.serviceImpl;
+package com.puhui.email.service.serviceimpl;
 
 import com.puhui.email.entity.Message;
 import com.puhui.email.mapper.MessageMapper;
@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;

@@ -6,7 +6,7 @@ import com.puhui.email.entity.Role;
 import com.puhui.email.service.MailUserService;
 import com.puhui.email.service.MessageService;
 import com.puhui.email.service.RoleService;
-import com.puhui.email.util.AESUtil;
+import com.puhui.email.util.AesUtil;
 import com.puhui.email.util.BaseResult;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
@@ -58,7 +58,7 @@ public class MessageController {
         MailUser user = mailUserService.queryUserByName(target);
 
         //获取  redis数据库 中对电话号码缓存的标识码
-        String phoneCode = (String) redisTemplates.opsForValue().get(AESUtil.decrypt(user.getPhone()));
+        String phoneCode = (String) redisTemplates.opsForValue().get(AesUtil.decrypt(user.getPhone()));
         if (user != null) {
             //判断30分钟内是否发送过短信
             if (phoneCode != null) {
@@ -70,7 +70,7 @@ public class MessageController {
             //新建一个短信对象
             Message message = new Message();
             //封装短信信息
-            message.setTargetphone(AESUtil.decrypt(user.getPhone()));
+            message.setTargetphone(AesUtil.decrypt(user.getPhone()));
             message.setTarget(target);
             message.setContent(content);
 
@@ -111,7 +111,7 @@ public class MessageController {
                 //接收人姓名
                 message.setTarget(str.getName());
                 //接收短信的电话号码
-                message.setTargetphone(AESUtil.decrypt(str.getPhone()));
+                message.setTargetphone(AesUtil.decrypt(str.getPhone()));
                 //短信内容
                 message.setContent(content);
                 //将所有短信实体放入队列中

@@ -1,6 +1,6 @@
 package com.puhui.email.config;
 
-import com.puhui.email.util.AESUtil;
+import com.puhui.email.util.AesUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
@@ -18,7 +18,7 @@ public class DefinitionSecurityPasswordEncoder implements PasswordEncoder {
     @Override
     public boolean matches(CharSequence rawPassword, String encodedPassword) {
         //rawPassword是前端传过来的密码，encodedPassword是数据库中查到的密码
-        String decryptPassword = AESUtil.decrypt(encodedPassword);
+        String decryptPassword = AesUtil.decrypt(encodedPassword);
         if (rawPassword.toString().equals(decryptPassword)) {
             return true;
         }

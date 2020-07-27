@@ -1,4 +1,4 @@
-package com.puhui.email.service.serviceImpl;
+package com.puhui.email.service.serviceimpl;
 
 import com.puhui.email.entity.MailUser;
 import com.puhui.email.entity.MyUserDetails;
@@ -7,7 +7,6 @@ import com.puhui.email.mapper.LoginMapper;
 import com.puhui.email.service.LoginService;
 import com.puhui.email.service.RoleService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

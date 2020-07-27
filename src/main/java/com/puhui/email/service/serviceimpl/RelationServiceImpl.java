@@ -1,8 +1,7 @@
-package com.puhui.email.service.serviceImpl;
+package com.puhui.email.service.serviceimpl;
 
 import com.puhui.email.entity.MailUseRelationRoleGroup;
 import com.puhui.email.entity.Relation;
-import com.puhui.email.mapper.MailRecordMapper;
 import com.puhui.email.mapper.RelationMapper;
 import com.puhui.email.service.RelationService;
 import lombok.extern.slf4j.Slf4j;
