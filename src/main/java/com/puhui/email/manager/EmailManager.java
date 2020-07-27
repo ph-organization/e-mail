@@ -2,9 +2,12 @@ package com.puhui.email.manager;
 
 import com.puhui.email.entity.MailRecord;
 import com.puhui.email.util.CommonUtil;
+
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.SimpleMailMessage;
@@ -13,6 +16,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
+
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -192,7 +196,7 @@ public class EmailManager {
         context.setVariable("topic", mailRecord.getTopic());
         context.setVariable("sender", sender);
         context.setVariable("content", mailRecord.getContent());
-        String content = this.templateEngine.process("mail/AdminTemplate", context);
+        String content = this.templateEngine.process("mail/UserTemplate", context);
         helper.setText(content, true);
 
         //添加附件
